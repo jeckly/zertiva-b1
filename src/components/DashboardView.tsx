@@ -41,25 +41,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate,
   onPacketChange,
 }) => {
-  const [activeSessionInfo, setActiveSessionInfo] = useState<string | null>(null);
+  const [activeSession, setActiveSession] = useState<{ tab: TabKey; label: string } | null>(null);
 
   useEffect(() => {
     const lesenSess = getActiveExamSession(ACTIVE_LESEN_KEY);
     if (lesenSess && !lesenSess.isSubmitted) {
-      setActiveSessionInfo("Lesen");
+      setActiveSession({ tab: "lesen", label: "Lesen" });
       return;
     }
     const horenSess = getActiveExamSession(ACTIVE_HOREN_KEY);
     if (horenSess && !horenSess.isSubmitted) {
-      setActiveSessionInfo("Hören");
+      setActiveSession({ tab: "hoeren", label: "Hören" });
       return;
     }
     const schreibenSess = getActiveExamSession(ACTIVE_SCHREIBEN_KEY);
     if (schreibenSess && !schreibenSess.isSubmitted) {
-      setActiveSessionInfo("Schreiben");
+      setActiveSession({ tab: "schreiben", label: "Schreiben" });
       return;
     }
-    setActiveSessionInfo(null);
+    setActiveSession(null);
   }, []);
 
   const getModuleAvg = (module: "lesen" | "hoeren" | "schreiben" | "sprechen") => {
@@ -125,18 +125,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Active Session Recovery Banner */}
-      {activeSessionInfo && (
+      {activeSession && (
         <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-between gap-4 animate-fade-in">
           <div className="flex items-center gap-2.5 text-xs text-amber-800 dark:text-amber-200 font-semibold">
             <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
             <span>
-              Anda memiliki sesi ujian <strong>{activeSessionInfo}</strong> yang belum diselesaikan. Progres tersimpan secara aman di peramban Anda.
+              Anda memiliki sesi ujian <strong>{activeSession.label}</strong> yang belum diselesaikan. Progres tersimpan secara aman di peramban Anda.
             </span>
           </div>
           <button
             type="button"
-            onClick={() => onNavigate(activeSessionInfo.toLowerCase() as TabKey)}
-            className="px-4 py-1.5 rounded-xl bg-amber-500 text-white font-bold text-xs shrink-0 shadow-xs hover:bg-amber-600 transition-colors"
+            onClick={() => onNavigate(activeSession.tab)}
+            className="px-4 py-1.5 rounded-xl bg-amber-500 text-white font-bold text-xs shrink-0 shadow-xs hover:bg-amber-600 transition-colors cursor-pointer"
           >
             Lanjutkan Sesi
           </button>

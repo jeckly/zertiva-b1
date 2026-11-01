@@ -294,6 +294,15 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
                 key={pid}
                 type="button"
                 onClick={() => {
+                  if (activePacketId === pid) return;
+                  const hasContent = Object.values(userTexts).some((t) => t.trim().length > 0);
+                  if (
+                    hasContent &&
+                    !isEvaluated &&
+                    !window.confirm(`Beralih ke Paket ${pid} akan mereset tulisan aktif saat ini. Lanjutkan?`)
+                  ) {
+                    return;
+                  }
                   setActivePacketId(pid);
                   handleResetExam(false);
                 }}

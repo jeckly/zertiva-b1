@@ -10,8 +10,8 @@ export interface SpeechPlayerOptions {
 
 class BulletproofSpeechPlayer {
   private isSpeaking: boolean = false;
+  private isManualStop: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
-  private currentUtterance: SpeechSynthesisUtterance | null = null;
   private cachedGermanVoice: SpeechSynthesisVoice | null = null;
   private sentenceQueue: string[] = [];
   private currentSentenceIdx: number = 0;
@@ -27,7 +27,7 @@ class BulletproofSpeechPlayer {
   private initVoices(): void {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     const voices = window.speechSynthesis.getVoices();
-    // Prioritize high-quality German voices (Google Deutsch, Anna, Markus, Siri, etc.)
+    // Prioritize high-quality German native voices
     const deVoice =
       voices.find((v) => v.lang === "de-DE" && !v.name.includes("Mobile")) ||
       voices.find((v) => v.lang === "de-DE") ||
@@ -43,18 +43,26 @@ class BulletproofSpeechPlayer {
     return this.cachedGermanVoice;
   }
 
-  // Split text into natural sentences to prevent mobile browsers cutting off long speech
+  // Split text into natural sentences to prevent mobile browsers cutting off long speech (> 15s)
   private splitIntoSentences(text: string): string[] {
-    const raw = text
+    const sanitized = text
+      .replace(/Dr\.\s+/g, "Dr.__SPACE__")
+      .replace(/z\.B\.\s+/g, "z.B.__SPACE__")
+      .replace(/bzw\.\s+/g, "bzw.__SPACE__")
+      .replace(/ca\.\s+/g, "ca.__SPACE__")
+      .replace(/Hr\.\s+/g, "Hr.__SPACE__")
+      .replace(/Fr\.\s+/g, "Fr.__SPACE__");
+
+    const raw = sanitized
       .split(/(?<=[.?!])\s+|\n+/)
-      .map((s) => s.trim())
+      .map((s) => s.replace(/__SPACE__/g, " ").trim())
       .filter((s) => s.length > 0);
     return raw.length > 0 ? raw : [text];
   }
 
   private startHeartbeat(): void {
     this.stopHeartbeat();
-    // Mobile browsers (Chromium / Safari) pause speechSynthesis after 15s. This heartbeat prevents that.
+    // Mobile browsers (Chromium / Safari) pause speechSynthesis after 15s. This heartbeat keeps it alive.
     this.heartbeatInterval = setInterval(() => {
       if (typeof window !== "undefined" && window.speechSynthesis && this.isSpeaking) {
         window.speechSynthesis.pause();
@@ -82,6 +90,7 @@ class BulletproofSpeechPlayer {
     this.sentenceQueue = this.splitIntoSentences(text);
     this.currentSentenceIdx = 0;
     this.isSpeaking = true;
+    this.isManualStop = false;
     this.startHeartbeat();
 
     options.onStart?.();
@@ -89,7 +98,7 @@ class BulletproofSpeechPlayer {
   }
 
   private playNextSentence(): void {
-    if (!this.isSpeaking || this.currentSentenceIdx >= this.sentenceQueue.length) {
+    if (!this.isSpeaking || this.isManualStop || this.currentSentenceIdx >= this.sentenceQueue.length) {
       this.finishPlayback();
       return;
     }
@@ -107,28 +116,32 @@ class BulletproofSpeechPlayer {
     }
 
     utterance.onend = () => {
+      if (!this.isSpeaking || this.isManualStop) return;
       this.currentSentenceIdx += 1;
       this.playNextSentence();
     };
 
     utterance.onerror = (e) => {
-      // If stopped deliberately, ignore
-      if (!this.isSpeaking) return;
+      if (!this.isSpeaking || this.isManualStop) return;
       this.activeOptions.onError?.(e);
       this.finishPlayback();
     };
 
-    this.currentUtterance = utterance;
     window.speechSynthesis.speak(utterance);
   }
 
   private finishPlayback(): void {
+    const wasNaturalEnd = this.isSpeaking && !this.isManualStop;
     this.isSpeaking = false;
+    this.isManualStop = false;
     this.stopHeartbeat();
-    this.activeOptions.onEnd?.();
+    if (wasNaturalEnd) {
+      this.activeOptions.onEnd?.();
+    }
   }
 
   public stop(): void {
+    this.isManualStop = true;
     this.isSpeaking = false;
     this.stopHeartbeat();
     if (typeof window !== "undefined" && window.speechSynthesis) {

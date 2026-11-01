@@ -23,7 +23,37 @@ export const UmlautHelperBar: React.FC<UmlautHelperBarProps> = ({
     if (onInsert) {
       onInsert(char);
     } else {
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
+      // If an input or textarea is active, insert directly at the cursor
+      const activeEl =
+        typeof document !== "undefined"
+          ? (document.activeElement as HTMLInputElement | HTMLTextAreaElement)
+          : null;
+      if (
+        activeEl &&
+        (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA") &&
+        !activeEl.readOnly &&
+        !activeEl.disabled
+      ) {
+        const start = activeEl.selectionStart ?? activeEl.value.length;
+        const end = activeEl.selectionEnd ?? activeEl.value.length;
+        const val = activeEl.value;
+        const updated = val.substring(0, start) + char + val.substring(end);
+        
+        // Use native setter to trigger React synthetic event
+        const nativeSetter =
+          Object.getOwnPropertyDescriptor(
+            activeEl.tagName === "INPUT" ? HTMLInputElement.prototype : HTMLTextAreaElement.prototype,
+            "value"
+          )?.set;
+        if (nativeSetter) {
+          nativeSetter.call(activeEl, updated);
+        } else {
+          activeEl.value = updated;
+        }
+        activeEl.dispatchEvent(new Event("input", { bubbles: true }));
+        activeEl.selectionStart = activeEl.selectionEnd = start + char.length;
+        activeEl.focus();
+      } else if (typeof navigator !== "undefined" && navigator.clipboard) {
         navigator.clipboard.writeText(char);
       }
     }

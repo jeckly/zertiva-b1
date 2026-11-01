@@ -2,7 +2,7 @@ import { HorenPacket } from "@/types";
 
 export const initialHorenPackets: HorenPacket[] = [
   // ==========================================
-  // PAKET A (UTAMA)
+  // PAKET A (UTAMA) - 10 QUESTIONS
   // ==========================================
   {
     packetId: "A",
@@ -15,7 +15,7 @@ export const initialHorenPackets: HorenPacket[] = [
         instruction: "Sie hören fünf kurze Texte. Sie hören jeden Text zweimal. Wählen Sie für die Aufgaben die richtige Lösung.",
         playLimit: 2,
         audioTranscript: `Aufgabe 1 und 2:
-"Achtung, eine Durchsage für Fahrgäste des Intercity-Express 582 nach Hamburg-Altona über Hannover Hauptbahnhof. Wegen kurzfristiger Reparaturarbeiten an einer Weile fährt dieser Zug heute nicht von Gleis 4 ab, sondern wird außerplanmäßig auf Gleis 9 bereitgestellt. Die Abfahrt verzögert sich voraussichtlich um 15 Minuten. Wir bitten alle Fahrgäste, die Unterführung zu Gleis 9 zu benutzen. Bitte achten Sie auf Durchsagen und die Anzeigen am Bahnsteig."
+"Achtung, eine Durchsage für Fahrgäste des Intercity-Express 582 nach Hamburg-Altona über Hannover Hauptbahnhof. Wegen kurzfristiger Reparaturarbeiten an einer Weiche fährt dieser Zug heute nicht von Gleis 4 ab, sondern wird außerplanmäßig auf Gleis 9 bereitgestellt. Die Abfahrt verzögert sich voraussichtlich um 15 Minuten. Wir bitten alle Fahrgäste, die Unterführung zu Gleis 9 zu benutzen. Bitte achten Sie auf Durchsagen und die Anzeigen am Bahnsteig."
 
 Aufgabe 3:
 "Guten Tag, Herr Schneider. Hier ist die Praxis Dr. Bergmann. Wir möchten Sie daran erinnern, dass Ihr gebuchter Kontrolltermin für die Zahnreinigung morgen, Donnerstag, um 14:30 Uhr stattfindet. Sollten Sie den Termin nicht wahrnehmen können, bitten wir Sie, uns spätestens bis heute 17:00 Uhr telefonisch zu informieren. Vielen Dank und auf Wiederhören."`,
@@ -144,7 +144,7 @@ Lukas: "Perfekt, machen wir so. Bring am besten deine Grammatikunterlagen mit!"`
       {
         teil: 4,
         title: "Teil 4: Radiodiskussion mit drei Teilnehmern",
-        instruction: "Sie hören eine Radiosendung zweimal. Wer sagt was? Wählen Sie: Moderator, Frau Sommer (Psychologin) oder Herr Krüger (Gastronom).",
+        instruction: "Sie hören eine Radiosendung zweimal. Wer sagt was? Wählen Sie: Moderator, Frau Dr. Sommer (Psychologin) oder Herr Krüger (Gastronom).",
         playLimit: 2,
         audioTranscript: `Radiosendung "Treffpunkt am Abend":
 Moderator: "Guten Abend, liebe Hörerinnen und Hörer. Willkommen zu unserer Diskussionsrunde. Heute fragen wir: 'Trinkgeld in Zeiten digitaler Kartenzahlung – stirbt eine Tradition aus?' Bei uns zu Gast sind die Psychologin Frau Dr. Sommer und der Restaurantbesitzer Herr Krüger. Herr Krüger, wie erleben Sie die Umstellung auf bargeldloses Bezahlen?"
@@ -179,7 +179,7 @@ Moderator: "Ein spannender Aspekt. Wir fassen zusammen: Die Digitalisierung ver�
   },
 
   // ==========================================
-  // PAKET B (CADANGAN 1)
+  // PAKET B (CADANGAN 1) - FULL 10 QUESTIONS
   // ==========================================
   {
     packetId: "B",
@@ -188,85 +188,166 @@ Moderator: "Ein spannender Aspekt. Wir fassen zusammen: Die Digitalisierung ver�
     teile: [
       {
         teil: 1,
-        title: "Teil 1: Kurze Ansagen",
-        instruction: "Sie hören zwei kurze Texte je zweimal.",
+        title: "Teil 1: Kurze Ansagen & Mitteilungen",
+        instruction: "Sie hören kurze Texte je zweimal. Wählen Sie für jede Aufgabe die richtige Lösung.",
         playLimit: 2,
-        audioTranscript: `"Achtung am Gate B24. Der Flug LH 1830 nach Berlin-Brandenburg ist nun zum Einsteigen bereit. Wir bitten zunächst Familien mit kleinen Kindern sowie Passagiere mit Hilfebedarf an Bord. Halten Sie bitte Ihre Bordkarte und Ihren Lichtbildausweis bereit."`,
+        audioTranscript: `Aufgabe 1 und 2:
+"Achtung am Gate B24. Der Flug LH 1830 nach Berlin-Brandenburg ist nun zum Einsteigen bereit. Wir bitten zunächst Familien mit kleinen Kindern sowie Passagiere mit Hilfebedarf an Bord. Danach folgen die Reihen 20 bis 35. Halten Sie bitte Ihre Bordkarte und Ihren Lichtbildausweis griffbereit. Wir danken für Ihre Geduld."
+
+Aufgabe 3:
+"Hallo Christian, hier ist Melanie vom Sportverein. Unser Hallentraining heute Abend um 19:30 Uhr muss leider ausfallen, da die Hallendecke repariert werden muss. Stattdessen treffen wir uns um 18:45 Uhr am Waldparkplatz für einen gemeinsamen Waldlauf. Gib mir bitte kurz per WhatsApp Bescheid, ob du dabei bist!"`,
         questions: [
           {
             id: "hor-b-t1-q1",
             teil: 1,
             questionNumber: 1,
-            questionText: "Wer darf zuerst in das Flugzeug einsteigen?",
+            questionText: "Wer darf zuerst in das Flugzeug nach Berlin einsteigen?",
             options: [
               "Alle Passagiere mit Sitzplätzen in den vorderen Reihen.",
               "Familien mit Kleinkindern und Personen mit Hilfebedarf.",
-              "Nur Passagiere ohne Handgepäck."
+              "Ausschließlich Passagiere der Business Class."
             ],
             correctAnswer: "Familien mit Kleinkindern und Personen mit Hilfebedarf.",
-            explanation: "Pengumuman meminta keluarga dengan anak kecil dan penumpang yang butuh bantuan masuk terlebih dahulu."
+            explanation: "Pengumuman bandara meminta keluarga dengan anak kecil dan penumpang yang butuh bantuan masuk terlebih dahulu."
+          },
+          {
+            id: "hor-b-t1-q2",
+            teil: 1,
+            questionNumber: 2,
+            questionText: "Welche Dokumente müssen Passagiere griffbereit halten?",
+            options: [
+              "Bordkarte und Lichtbildausweis.",
+              "Nur das Flugticket auf Papier.",
+              "Reisekrankenversicherung und Hotelvoucher."
+            ],
+            correctAnswer: "Bordkarte und Lichtbildausweis.",
+            explanation: "Petugas gate meminta kartu pas naik (Bordkarte) dan kartu identitas foto (Lichtbildausweis)."
+          },
+          {
+            id: "hor-b-t1-q3",
+            teil: 1,
+            questionNumber: 3,
+            questionText: "Warum fällt das Hallentraining heute aus?",
+            options: [
+              "Weil die Trainerin krank geworden ist.",
+              "Weil Reparaturen an der Hallendecke stattfinden.",
+              "Weil das Wetter zu schön ist."
+            ],
+            correctAnswer: "Weil Reparaturen an der Hallendecke stattfinden.",
+            explanation: "Latihan indoor dibatalkan karena perbaikan atap aula ('die Hallendecke repariert werden muss')."
           }
         ]
       },
       {
         teil: 2,
         title: "Teil 2: Monolog über ein Stadtfest",
-        instruction: "Sie hören den Text einmal.",
+        instruction: "Sie hören den Text einmal. Wählen Sie bei den Aufgaben A, B oder C.",
         playLimit: 1,
-        audioTranscript: `"Liebe Bürgerinnen und Bürger! Am kommenden Samstag feiert unsere Stadt das 750-jährige Stadtjubiläum auf dem Marktplatz. Ab 11 Uhr morgens gibt es Kunsthandwerk, regionale Spezialitäten und ein kostenloses Kinderkarussell. Bitte beachten Sie, dass die Zufahrtsstraßen zum Stadtkern ab Freitagabend für den Autoverkehr gesperrt sind. Nutzen Sie bitte die kostenlosen Shuttlebusse vom Bahnhof."`,
+        audioTranscript: `"Liebe Bürgerinnen und Bürger! Am kommenden Samstag feiert unsere Stadt das 750-jährige Stadtjubiläum auf dem historischen Marktplatz. Ab 11 Uhr morgens gibt es Kunsthandwerk, regionale Spezialitäten und ein kostenloses Kinderkarussell. Auf der Hauptbühne vor dem Rathaus spielen ab 14 Uhr lokale Jazz- und Rockbands. Bitte beachten Sie, dass die Zufahrtsstraßen zum Stadtkern ab Freitagabend für den gesamten Autoverkehr gesperrt sind. Parkplätze stehen am Messegelände zur Verfügung; von dort verkehren alle zehn Minuten kostenlose Shuttlebusse direkt zum Marktplatz. Wir freuen uns auf Ihren Besuch!"`,
         questions: [
           {
-            id: "hor-b-t2-q2",
+            id: "hor-b-t2-q4",
             teil: 2,
-            questionNumber: 2,
+            questionNumber: 4,
             questionText: "Wie sollten die Besucher zum Marktplatz anreisen?",
             options: [
-              "Mit dem eigenen Auto direkt auf den Marktplatz fahren.",
-              "Mit den kostenlosen Shuttlebussen ab dem Bahnhof.",
-              "Ausschließlich mit dem Taxi."
+              "Mit dem eigenen Auto direkt vor das Rathaus fahren.",
+              "Mit den kostenlosen Shuttlebussen ab dem Messegelände.",
+              "Ausschließlich zu Fuß vom Flughafen aus."
             ],
-            correctAnswer: "Mit den kostenlosen Shuttlebussen ab dem Bahnhof.",
-            explanation: "Karena jalanan pusat kota ditutup untuk mobil, panitia menyediakan bus jemputan gratis dari stasiun."
+            correctAnswer: "Mit den kostenlosen Shuttlebussen ab dem Messegelände.",
+            explanation: "Karena jalan pusat kota ditutup, pengunjung disarankan memarkir mobil di area pameran (Messegelände) dan naik bus shuttle gratis."
+          },
+          {
+            id: "hor-b-t2-q5",
+            teil: 2,
+            questionNumber: 5,
+            questionText: "Was wird speziell für Kinder kostenlos angeboten?",
+            options: [
+              "Kostenloses Eis und Limonade.",
+              "Ein Kinderkarussell auf dem Marktplatz.",
+              "Ein Malwettbewerb im Rathaus."
+            ],
+            correctAnswer: "Ein Kinderkarussell auf dem Marktplatz.",
+            explanation: "Monolog menyebutkan 'ein kostenloses Kinderkarussell' (komidi putar gratis untuk anak-anak)."
+          },
+          {
+            id: "hor-b-t2-q6",
+            teil: 2,
+            questionNumber: 6,
+            questionText: "Ab wann sind die Zufahrtsstraßen für Autos gesperrt?",
+            options: [
+              "Erst am Samstag ab 11 Uhr.",
+              "Bereits ab Freitagabend.",
+              "Gar nicht, Autos dürfen überall parken."
+            ],
+            correctAnswer: "Bereits ab Freitagabend.",
+            explanation: "Akses jalan ditutup mulai Jumat malam ('ab Freitagabend gesperrt')."
           }
         ]
       },
       {
         teil: 3,
         title: "Teil 3: Gespräch über Sprachkurs",
-        instruction: "Sie hören ein Gespräch einmal.",
+        instruction: "Sie hören ein Gespräch einmal. Wählen Sie für jede Aufgabe: Richtig oder Falsch.",
         playLimit: 1,
-        audioTranscript: `Mann: "Tina, hast du dich schon für den Deutsch-Intensivkurs angemeldet?"
-Frau: "Ja, gestern! Aber der Unterricht findet jetzt montags und mittwochs von 18 bis 21 Uhr statt, nicht mehr dienstags."
-Mann: "Super, dann können wir dienstags weiterhin zusammen zum Fußballtraining gehen!"`,
+        audioTranscript: `Dialog:
+Mann: "Tina, hast du dich schon für den Deutsch-Intensivkurs an der Volkshochschule angemeldet?"
+Frau: "Ja, gestern Abend online! Aber der Unterricht findet jetzt montags und mittwochs von 18 bis 21 Uhr statt, nicht mehr dienstags."
+Mann: "Super, dann kollidiert das gar nicht mit unserem Fußballtraining am Dienstagabend!"
+Frau: "Genau. Und die Kursleiterin hat gesagt, dass wir uns bis zur zweiten Unterrichtsstunde das neue B1-Lehrbuch besorgen müssen."`,
         questions: [
           {
-            id: "hor-b-t3-q3",
+            id: "hor-b-t3-q7",
             teil: 3,
-            questionNumber: 3,
-            questionText: "Der Sprachkurs von Tina kollidiert mit dem Fußballtraining am Dienstag.",
+            questionNumber: 7,
+            questionText: "Der Sprachkurs von Tina findet an denselben Wochentagen wie das Fußballtraining statt.",
             options: ["Richtig", "Falsch"],
             correctAnswer: "Falsch",
-            explanation: "Kursus bahasa dialihkan ke Senin dan Rabu, sehingga Selasa mereka tetap bebas latihan bola."
+            explanation: "Kursus bahasa diadakan hari Senin dan Rabu, sehingga tidak bertabrakan dengan latihan sepak bola di hari Selasa."
+          },
+          {
+            id: "hor-b-t3-q8",
+            teil: 3,
+            questionNumber: 8,
+            questionText: "Tina hat sich bereits für den Sprachkurs eingeschrieben.",
+            options: ["Richtig", "Falsch"],
+            correctAnswer: "Richtig",
+            explanation: "Tina mendaftar kemarin malam secara daring ('Ja, gestern Abend online!')."
           }
         ]
       },
       {
         teil: 4,
         title: "Teil 4: Podiumsdiskussion zu Social Media",
-        instruction: "Wer äußert folgende Meinung? Moderator, Herr Becker oder Frau Klein.",
+        instruction: "Wer äußert folgende Meinung? Moderator, Herr Becker (Soziologe) oder Frau Klein (Lehrerin).",
         playLimit: 2,
-        audioTranscript: `Moderator: "Guten Tag. Macht Social Media Jugendliche einsam oder vernetzter? Frau Klein meint dazu..."
-Frau Klein: "Ich sehe vor allem die Gefahr der ständigen Vergleichskultur. Viele Jugendliche entwickeln Minderwertigkeitskomplexe durch gefilterte Fotos."
-Herr Becker: "Man darf aber nicht vergessen, dass soziale Netzwerke schüchternen Jugendlichen helfen, Gleichgesinnte für Hobbys und Nischenthemen zu finden."`,
+        audioTranscript: `Radiosendung:
+Moderator: "Macht Social Media unsere Jugend einsamer oder vernetzter? Bei uns diskutieren die Gymnasiallehrerin Frau Klein und der Mediensoziologe Herr Becker."
+
+Frau Klein: "Ich beobachte auf dem Schulhof täglich, wie Schüler nebeneinander sitzen und stumm auf ihr Smartphone starren. Viele Jugendliche entwickeln Minderwertigkeitskomplexe durch gefilterte, scheinbar perfekte Fotos anderer. Das reale soziale Miteinander verkümmert zusehends."
+
+Herr Becker: "Das ist mir zu einseitig negativ. Zahlreiche wissenschaftliche Erhebungen zeigen, dass soziale Netzwerke gerade schüchternen Jugendlichen helfen, Gleichgesinnte für Nischeninteressen zu finden. Für viele junge Menschen bieten Online-Communities emotionalen Rückhalt, den sie im direkten Umfeld vermissen."
+
+Moderator: "Zwei wichtige Perspektiven: Einerseits Schutz vor ungesundem Vergleichsdruck, andererseits die Chance auf weltweite Vernetzung."`,
         questions: [
           {
-            id: "hor-b-t4-q4",
+            id: "hor-b-t4-q9",
             teil: 4,
-            questionNumber: 4,
-            questionText: "Wer sieht Vorteile von Social Media für zurückhaltende junge Menschen?",
+            questionNumber: 9,
+            questionText: "Wer sieht vor allem die Gefahr, dass Jugendliche Minderwertigkeitskomplexe durch gefilterte Bilder entwickeln?",
+            options: ["Moderator", "Herr Becker", "Frau Klein"],
+            correctAnswer: "Frau Klein",
+            explanation: "Frau Klein (guru) menyoroti risiko foto sempurna berbfilter yang memicu rasa rendah diri pada remaja."
+          },
+          {
+            id: "hor-b-t4-q10",
+            teil: 4,
+            questionNumber: 10,
+            questionText: "Wer betont, dass soziale Medien schüchternen Teenagern beim Finden von Gleichgesinnten helfen?",
             options: ["Moderator", "Herr Becker", "Frau Klein"],
             correctAnswer: "Herr Becker",
-            explanation: "Herr Becker menjelaskan bahwa media sosial membantu remaja pemalu mencari teman sehobi."
+            explanation: "Herr Becker (sosiolog) menjelaskan bahwa media sosial menjadi ruang aman bagi remaja pemalu untuk menemukan teman sehobi."
           }
         ]
       }
@@ -274,7 +355,7 @@ Herr Becker: "Man darf aber nicht vergessen, dass soziale Netzwerke schüchterne
   },
 
   // ==========================================
-  // PAKET C (CADANGAN 2)
+  // PAKET C (CADANGAN 2) - FULL 10 QUESTIONS
   // ==========================================
   {
     packetId: "C",
@@ -283,85 +364,162 @@ Herr Becker: "Man darf aber nicht vergessen, dass soziale Netzwerke schüchterne
     teile: [
       {
         teil: 1,
-        title: "Teil 1: Radio-Wetterbericht & Verkehr",
-        instruction: "Sie hören den Text zweimal.",
+        title: "Teil 1: Radio-Wetterbericht & Service-Meldungen",
+        instruction: "Sie hören kurze Texte je zweimal. Wählen Sie die richtige Lösung.",
         playLimit: 2,
-        audioTranscript: `"Hier ist der Verkehrsfunk. Auf der Autobahn A3 zwischen Frankfurt und Würzburg gibt es nach einem Unfall 8 Kilometer Stau. Rechnen Sie mit mindestens 45 Minuten Verzögerung. Wir empfehlen die Umleitung über die Bundesstraße 26."`,
+        audioTranscript: `Aufgabe 1 und 2:
+"Hier ist der Verkehrsfunk für Süddeutschland. Auf der Autobahn A3 zwischen Frankfurt und Würzburg gibt es nach einem LKW-Unfall 8 Kilometer Stau. Rechnen Sie mit mindestens 45 Minuten Verzögerung. Einsatzkräfte sind vor Ort. Wir empfehlen allen Autofahrern die ausgeschilderte Umleitungsstrecke über die Bundesstraße 26."
+
+Aufgabe 3:
+"Guten Tag Frau Weber, hier spricht Meyer vom Kundenservice des Möbelhauses Ambiente. Ihr bestelltes Schlafsofa ist heute in unserem Zentrallager eingetroffen. Wir möchten mit Ihnen einen Liefertermin vereinbaren. Unsere Spedition könnte am kommenden Freitag zwischen 8 und 12 Uhr liefern. Rufen Sie uns bitte unter der Durchwahl 440 zurück."`,
         questions: [
           {
             id: "hor-c-t1-q1",
             teil: 1,
             questionNumber: 1,
-            questionText: "Autofahrern auf der A3 wird empfohlen,...",
+            questionText: "Autofahrern auf der Autobahn A3 wird empfohlen,...",
             options: [
-              "sofort auf einen Rastplatz zu fahren und zu warten.",
+              "sofort auf den nächsten Rastplatz zu fahren und zu übernachten.",
               "die Umleitungsstrecke über die B26 zu nutzen.",
               "nach Frankfurt umzukehren."
             ],
             correctAnswer: "die Umleitungsstrecke über die B26 zu nutzen.",
-            explanation: "Penyiar menyarankan jalur alternatif B26 untuk menghindari macet 45 menit."
+            explanation: "Penyiar menyarankan menggunakan jalur pengalihan B26 untuk menghindari kemacetan 45 menit."
+          },
+          {
+            id: "hor-c-t1-q2",
+            teil: 1,
+            questionNumber: 2,
+            questionText: "Wie lang ist der Stau auf der A3?",
+            options: ["3 Kilometer.", "8 Kilometer.", "15 Kilometer."],
+            correctAnswer: "8 Kilometer.",
+            explanation: "Berita lalu lintas menyebutkan '8 Kilometer Stau' akibat kecelakaan truk."
+          },
+          {
+            id: "hor-c-t1-q3",
+            teil: 1,
+            questionNumber: 3,
+            questionText: "Herr Meyer vom Möbelhaus ruft an, weil...",
+            options: [
+              "das bestellte Möbelstück beschädigt wurde.",
+              "das Sofa eingetroffen ist und ein Liefertermin vereinbart werden soll.",
+              "Frau Weber die Rechnung noch nicht bezahlt hat."
+            ],
+            correctAnswer: "das Sofa eingetroffen ist und ein Liefertermin vereinbart werden soll.",
+            explanation: "Sofa pesanan telah sampai di gudang dan toko ingin menentukan jadwal pengantaran barang."
           }
         ]
       },
       {
         teil: 2,
         title: "Teil 2: Begrüßung bei der Jobmesse",
-        instruction: "Sie hören den Text einmal.",
+        instruction: "Sie hören den Text einmal. Wählen Sie bei jeder Aufgabe A, B oder C.",
         playLimit: 1,
-        audioTranscript: `"Guten Morgen liebe Studierende und Absolventen! Willkommen auf der Karrieremesse 'Chance 2026'. An über 80 Ständen stellen sich heute IT-Unternehmen, Banken und Handwerksbetriebe vor. Nutzen Sie die Gelegenheit für kostenlose Bewerbungsmappen-Checks in Halle B, Raum 104."`,
+        audioTranscript: `"Guten Morgen liebe Studierende und Absolventen! Herzlich willkommen auf der 15. Karrieremesse 'Chance 2026' im Kongresszentrum Leipzig. An über 80 Firmenständen stellen sich heute führende Unternehmen aus den Bereichen IT, Maschinenbau, Finanzwesen und Pflege vor. Nutzen Sie die einmalige Gelegenheit, direkt mit Personalchefs ins Gespräch zu kommen. In Halle B, Raum 104 bieten wir den ganzen Tag über kostenlose Bewerbungsmappen-Checks und professionelle Bewerbungsfotos an. Bitte beachten Sie auch die Fachvorträge im Hauptsaal ab 13 Uhr. Viel Erfolg für Ihre berufliche Zukunft!"`,
         questions: [
           {
-            id: "hor-c-t2-q2",
+            id: "hor-c-t2-q4",
             teil: 2,
-            questionNumber: 2,
+            questionNumber: 4,
             questionText: "Wo können Messebesucher ihre Bewerbungsunterlagen überprüfen lassen?",
             options: [
               "Direkt an jedem Firmenstand in Halle A.",
               "In Halle B, Raum 104 kostenlos.",
-              "Nur online nach der Messe gegen Gebühr."
+              "Ausschließlich online gegen eine Gebühr von 20 Euro."
             ],
             correctAnswer: "In Halle B, Raum 104 kostenlos.",
             explanation: "Pemeriksaan berkas lamaran gratis ada di Halle B, Raum 104."
+          },
+          {
+            id: "hor-c-t2-q5",
+            teil: 2,
+            questionNumber: 5,
+            questionText: "Wie viele Unternehmen präsentieren sich auf der Messe?",
+            options: [
+              "Über 80 Firmen.",
+              "Genau 15 Betriebe.",
+              "Mehr als 200 Konzerne."
+            ],
+            correctAnswer: "Über 80 Firmen.",
+            explanation: "Penyelenggara mengumumkan ada lebih dari 80 perusahaan peserta ('über 80 Firmenständen')."
+          },
+          {
+            id: "hor-c-t2-q6",
+            teil: 2,
+            questionNumber: 6,
+            questionText: "Wann beginnen die Fachvorträge im Hauptsaal?",
+            options: [
+              "Um 09:00 Uhr morgens.",
+              "Ab 13:00 Uhr.",
+              "Erst nach 18:00 Uhr."
+            ],
+            correctAnswer: "Ab 13:00 Uhr.",
+            explanation: "Kuliah umum dimulai pada pukul 13:00 ('Fachvorträge im Hauptsaal ab 13 Uhr')."
           }
         ]
       },
       {
         teil: 3,
         title: "Teil 3: Gespräch über Nachbarschaftshilfe",
-        instruction: "Sie hören ein kurzes Gespräch.",
+        instruction: "Sie hören ein kurzes Gespräch. Wählen Sie: Richtig oder Falsch.",
         playLimit: 1,
-        audioTranscript: `Herr Krause: "Guten Tag Frau Meyer! Fahren Sie nächste Woche in den Urlaub?"
-Frau Meyer: "Ja, für zwei Wochen nach Italien. Könnten Sie vielleicht alle zwei Tage meine Blumen auf dem Balkon gießen?"
-Herr Krause: "Aber selbstverständlich, das mache ich sehr gerne! Geben Sie mir einfach vor Ihrer Abreise den Schlüssel."`,
+        audioTranscript: `Dialog:
+Herr Krause: "Guten Tag, Frau Meyer! Packen Sie gerade Ihr Auto? Fahren Sie in den Urlaub?"
+Frau Meyer: "Ja, Herr Krause! Morgen früh geht es für zwei Wochen an den Gardasee nach Italien. Könnten Sie vielleicht alle zwei Tage meine Blumen auf dem Balkon gießen und den Briefkasten leeren?"
+Herr Krause: "Aber selbstverständlich, liebe Nachbarin! Das mache ich doch sehr gern. Geben Sie mir einfach heute Abend noch Ihren Wohnungsschlüssel."
+Frau Meyer: "Vielen herzlichen Dank! Ich bringe Ihnen dafür echten italienischen Parmesan mit."`,
         questions: [
           {
-            id: "hor-c-t3-q3",
+            id: "hor-c-t3-q7",
             teil: 3,
-            questionNumber: 3,
-            questionText: "Herr Krause weigert sich, die Blumen von Frau Meyer zu gießen.",
+            questionNumber: 7,
+            questionText: "Herr Krause weigert sich, Frau Meyer während ihres Urlaubs zu helfen.",
             options: ["Richtig", "Falsch"],
             correctAnswer: "Falsch",
-            explanation: "Herr Krause dengan senang hati bersedia membantu ('Aber selbstverständlich, das mache ich sehr gerne!')."
+            explanation: "Herr Krause dengan ramah dan senang hati bersedia menyiram bunga dan mengambil surat."
+          },
+          {
+            id: "hor-c-t3-q8",
+            teil: 3,
+            questionNumber: 8,
+            questionText: "Frau Meyer reist für zwei Wochen nach Italien.",
+            options: ["Richtig", "Falsch"],
+            correctAnswer: "Richtig",
+            explanation: "Frau Meyer berlibur selama 2 minggu ke Danau Garda di Italia ('für zwei Wochen an den Gardasee')."
           }
         ]
       },
       {
         teil: 4,
         title: "Teil 4: Diskussion über gesunde Ernährung an Schulen",
-        instruction: "Wer vertritt welche Position?",
+        instruction: "Wer vertritt welche Position? Moderator, Schulleiter Herr Weber oder Mutter Frau Schmidt.",
         playLimit: 2,
-        audioTranscript: `Moderator: "Sollten Süßigkeitenautomaten an Schulen verboten werden? Schulleiter Herr Weber..."
-Herr Weber: "Ja, absolut. Die Schule hat einen Erziehungsauftrag. Wenn Schüler in jeder Pause Limonade und Schokoriegel kaufen können, fördert das Übergewicht und Konzentrationsschwächen."
-Frau Schmidt (Mutter): "Verbote bringen doch nichts, dann kaufen die Kinder die Schokolade einfach auf dem Heimweg im Kiosk. Wir müssen lieber über gesunde Ernährung aufklären."`,
+        audioTranscript: `Radiodiskussion:
+Moderator: "Willkommen zu unserer Debatte: 'Sollten Verkaufsautomaten für Süßigkeiten und zuckerhaltige Limonaden an Schulen gesetzlich verboten werden?' Herr Schulleiter Weber..."
+
+Herr Weber: "Ja, ganz entschieden! Die Schule trägt einen umfassenden Erziehungs- und Gesundheitsauftrag. Wenn Jugendliche in jeder großen Pause Schokoriegel und Energydrinks kaufen können, führt das nachweislich zu Konzentrationsabfall und langfristig zu Übergewicht. Als Schule müssen wir ein klares gesundes Signal setzen."
+
+Frau Schmidt: "Ich bin da anderer Meinung. Reine Verbote bringen überhaupt nichts, denn dann laufen die Kinder in der Mittagspause einfach zum Kiosk an der Straßenecke und kaufen dort die doppelte Menge. Wir müssen Kinder zu eigenverantwortlichem Konsum erziehen und im Unterricht über Nährwerte aufklären, statt einfach Automaten abzuschalten."
+
+Moderator: "Ein klassischer Konflikt: Schutz durch Reglementierung versus Aufklärung und Eigenverantwortung."`,
         questions: [
           {
-            id: "hor-c-t4-q4",
+            id: "hor-c-t4-q9",
             teil: 4,
-            questionNumber: 4,
-            questionText: "Wer argumentiert für ein Verbot von Süßigkeitenautomaten an Schulen?",
+            questionNumber: 9,
+            questionText: "Wer argumentiert für ein striktes Verbot von Süßigkeitenautomaten an Schulen?",
             options: ["Moderator", "Herr Weber", "Frau Schmidt"],
             correctAnswer: "Herr Weber",
-            explanation: "Herr Weber mendukung larangan karena sekolah bertanggung jawab mendidik pola hidup sehat."
+            explanation: "Herr Weber (kepala sekolah) mendukung pelarangan tegas demi kesehatan dan konsentrasi siswa."
+          },
+          {
+            id: "hor-c-t4-q10",
+            teil: 4,
+            questionNumber: 10,
+            questionText: "Wer meint, dass Verbote wirkungslos sind, weil Schüler Süßigkeiten dann außerhalb der Schule kaufen?",
+            options: ["Moderator", "Herr Weber", "Frau Schmidt"],
+            correctAnswer: "Frau Schmidt",
+            explanation: "Frau Schmidt (orang tua) berpendapat bahwa larangan tidak efektif karena murid akan membeli di kios pinggir jalan."
           }
         ]
       }

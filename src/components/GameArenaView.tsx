@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { GameQuestion, Difficulty, UserStats } from "@/types";
-import { getAllGameQuestions, recordGameAnswer, addFehlerItem } from "@/lib/storage";
+import { getAllGameQuestions, recordGameAnswer, addFehlerItem, saveStats } from "@/lib/storage";
 import confetti from "canvas-confetti";
 import {
   Heart,
@@ -189,8 +189,13 @@ export const GameArenaView: React.FC<GameArenaViewProps> = ({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setZenMode(!zenMode)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all ${
+            onClick={() => {
+              const nextZen = !zenMode;
+              setZenMode(nextZen);
+              const updated = saveStats({ zenMode: nextZen });
+              onStatsUpdate(updated);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
               zenMode
                 ? "bg-teal-50 dark:bg-teal-950/40 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300"
                 : "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400"

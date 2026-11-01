@@ -36,11 +36,12 @@ export const InteractiveText: React.FC<InteractiveTextProps> = ({
 
   const handleSaveVocab = () => {
     if (!selectedWord) return;
+    const cleanRaw = selectedWord.raw.replace(/[.,/#!$%^&*;:{}=\-_`~()?"'„“]/g, "").trim();
     saveVocabWord({
       german: selectedWord.entry.german,
       indonesian: selectedWord.entry.indonesian,
       article: selectedWord.entry.article,
-      exampleSentence: `Kontext: ${selectedWord.raw}`,
+      exampleSentence: `Gefunden im Prüfungstext: "${cleanRaw}"`,
     });
     setSavedSuccess(true);
     onVocabSaved?.();

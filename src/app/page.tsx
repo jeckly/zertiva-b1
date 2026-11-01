@@ -57,6 +57,13 @@ export default function Home() {
     setMounted(true);
   }, []);
 
+  // Synchronize stats, badges, and exam history on every tab change
+  useEffect(() => {
+    if (mounted) {
+      refreshState();
+    }
+  }, [activeTab, mounted]);
+
   const handlePacketChange = (packet: PacketId) => {
     const updated = saveStats({ activePacket: packet });
     setStats(updated);

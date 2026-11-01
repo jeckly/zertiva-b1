@@ -222,6 +222,14 @@ export const LesenView: React.FC<LesenViewProps> = ({ stats }) => {
                 key={pid}
                 type="button"
                 onClick={() => {
+                  if (activePacketId === pid) return;
+                  if (
+                    Object.keys(answers).length > 0 &&
+                    !isSubmitted &&
+                    !window.confirm(`Beralih ke Paket ${pid} akan mereset progres ujian aktif. Lanjutkan?`)
+                  ) {
+                    return;
+                  }
                   setActivePacketId(pid);
                   handleResetExam(false);
                 }}

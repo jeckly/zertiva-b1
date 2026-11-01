@@ -279,7 +279,7 @@ Leserbrief 3 (Stefan, 58, Handwerksmeister):
             id: "les-a-t4-q15",
             teil: 4,
             questionNumber: 15,
-            questionText: "Ist Stefan (Handwerksmeister) DAFÜR (Ja) atau DAGEGEN (Nein)?",
+            questionText: "Ist Stefan (Handwerksmeister) DAFÜR (Ja) oder DAGEGEN (Nein)?",
             options: ["Dafür (Ja)", "Dagegen (Nein)"],
             correctAnswer: "Dagegen (Nein)",
             explanation: "Stefan menentang (Dagegen) karena tukang servis dan pengantar barang tidak bisa membawa peralatan berat hanya dengan sepeda.",
@@ -349,7 +349,7 @@ Der Hausmüll ist gemäß den behördlichen Vorgaben sorgfältig nach Restmüll,
   },
 
   // ==========================================
-  // PAKET B (CADANGAN 1)
+  // PAKET B (CADANGAN 1) - FULL 18 SOAL
   // ==========================================
   {
     packetId: "B",
@@ -582,10 +582,18 @@ Gleichzeitig warnen Ernährungswissenschaftler vor blindem Vertrauen in verarbei
       {
         teil: 4,
         title: "Teil 4: Leserbriefe zu 'Haustiere am Arbeitsplatz'",
-        instruction: "Lesen Sie die Beiträge. Ist die Person DAFÜR oder DAGEGEN?",
+        instruction: "Lesen Sie die Beiträge. Ist die Person DAFÜR (Ja) oder DAGEGEN (Nein)?",
         textTitle: "Bürohunde: Sollten Hunde am Arbeitsplatz erlaubt sein?",
-        readingText: `Beitrag 1 (Claudia): "Studien beweisen, dass die Anwesenheit von Hunden den Cortisolspiegel der Mitarbeiter senkt und für bessere Laune im Team sorgt. Solange der Hund gut erzogen ist, halte ich das für einen fantastischen Schritt."
-Beitrag 2 (Mehmet): "Ich leide unter einer extremen Tierhaarallergie. Wenn ein Kollege einen Hund mitbringt, brennen meine Augen und ich bekomme Atemnot. Arbeitsplätze müssen neutral und sicher für alle Kollegen sein. Haustiere gehören nach Hause!"`,
+        readingText: `Thema: Sollten Arbeitgeber das Mitbringen von Hunden ins Büro generell gestatten?
+
+Beitrag 1 (Claudia, Marketingmanagerin):
+"Studien beweisen, dass die Anwesenheit von Hunden den Cortisolspiegel der Mitarbeiter senkt und für bessere Laune im Team sorgt. Unser Bürohund 'Balu' bringt alle zum Lächeln und fördert kurze Bewegungspausen. Solange der Hund gut erzogen ist, halte ich das für einen fantastischen Schritt für jede moderne Firma."
+
+Beitrag 2 (Mehmet, Softwareentwickler):
+"Ich leide unter einer extremen Tierhaarallergie. Wenn ein Kollege einen Hund mitbringt, brennen meine Augen und ich bekomme Atemnot. Arbeitsplätze müssen neutral, hygienisch und sicher für alle Kollegen sein. Haustiere gehören nach Hause oder in den Garten, nicht in geschlossene Großraumbüros!"
+
+Beitrag 3 (Anja, Abteilungsleiterin Personal):
+"Ein Hund im Büro führt unweigerlich zu Konflikten: Wer haftet, wenn ein Hund ein teures Computerkabel durchbeißt oder einen Kunden anspringt? Außerdem haben nicht wenige Menschen panische Angst vor Hunden. Aus arbeitsrechtlichen und organisatorischen Gründen lehne ich das entschieden ab."`,
         questions: [
           {
             id: "les-b-t4-q13",
@@ -601,28 +609,41 @@ Beitrag 2 (Mehmet): "Ich leide unter einer extremen Tierhaarallergie. Wenn ein K
             id: "les-b-t4-q14",
             teil: 4,
             questionNumber: 14,
-            questionText: "Ist Mehmet DAFÜR (Ja) oder DAGEGEN (Nein)?",
+            questionText: "Ist Mehmet DAFÜR (Ja) atau DAGEGEN (Nein)?",
             options: ["Dafür (Ja)", "Dagegen (Nein)"],
             correctAnswer: "Dagegen (Nein)",
             explanation: "Mehmet menolak karena menderita alergi bulu hewan yang parah hingga sesak napas.",
             evidenceQuote: "Arbeitsplätze müssen neutral und sicher für alle Kollegen sein. Haustiere gehören nach Hause!"
+          },
+          {
+            id: "les-b-t4-q15",
+            teil: 4,
+            questionNumber: 15,
+            questionText: "Ist Anja (Personal) DAFÜR (Ja) atau DAGEGEN (Nein)?",
+            options: ["Dafür (Ja)", "Dagegen (Nein)"],
+            correctAnswer: "Dagegen (Nein)",
+            explanation: "Anja menolak secara tegas ('lehne ich entschieden ab') karena masalah tanggung jawab hukum (Haftung) dan rasa takut karyawan.",
+            evidenceQuote: "Aus arbeitsrechtlichen und organisatorischen Gründen lehne ich das entschieden ab."
           }
         ]
       },
       {
         teil: 5,
         title: "Teil 5: Bibliotheksordnung",
-        instruction: "Lesen Sie die Ordnung der Stadtbibliothek und die Fragen dazu.",
+        instruction: "Lesen Sie die Ordnung der Stadtbibliothek und die Aufgaben 16 bis 18 dazu.",
         textTitle: "Benutzungsordnung der Stadtbibliothek Heidelberg",
         readingText: `§ 4 Ausleihfristen und Verlängerungen
 1. Die reguläre Leihfrist für Bücher beträgt 4 Wochen, für DVDs und Zeitschriften 2 Wochen.
 2. Eine Verlängerung ist bis zu zweimal möglich, sofern keine Vormerkung durch einen anderen Leser vorliegt.
-3. Bei verspäteter Rückgabe fällt ab dem ersten Tag der Fristüberschreitung eine Gebühr von 1,50 € pro Medieneinheit und Woche an.`,
+3. Bei verspäteter Rückgabe fällt ab dem ersten Tag der Fristüberschreitung eine Gebühr von 1,50 € pro Medieneinheit und Woche an.
+
+§ 8 Verhalten in den Lesesälen
+Im gesamten Lesesaalbereich herrscht absolute Stille. Das Telefonieren mit Mobiltelefonen ist strikt untersagt; Geräte sind auf lautlos zu schalten. Das Mitbringen von offenen Getränken und Speisen ist nicht gestattet; lediglich Wasser in verschließbaren Flaschen darf an die Arbeitsplätze mitgenommen werden.`,
         questions: [
           {
-            id: "les-b-t5-q15",
+            id: "les-b-t5-q16",
             teil: 5,
-            questionNumber: 15,
+            questionNumber: 16,
             questionText: "Wie lange darf man DVDs ausleihen?",
             options: ["4 Wochen", "2 Wochen", "Beliebig lange"],
             correctAnswer: "2 Wochen",
@@ -630,9 +651,9 @@ Beitrag 2 (Mehmet): "Ich leide unter einer extremen Tierhaarallergie. Wenn ein K
             evidenceQuote: "...für DVDs und Zeitschriften 2 Wochen."
           },
           {
-            id: "les-b-t5-q16",
+            id: "les-b-t5-q17",
             teil: 5,
-            questionNumber: 16,
+            questionNumber: 17,
             questionText: "Wann kann ein Buch NICHT verlängert werden?",
             options: [
               "Wenn ein anderer Leser das Buch bereits reserviert/vorgemerkt hat.",
@@ -642,6 +663,20 @@ Beitrag 2 (Mehmet): "Ich leide unter einer extremen Tierhaarallergie. Wenn ein K
             correctAnswer: "Wenn ein anderer Leser das Buch bereits reserviert/vorgemerkt hat.",
             explanation: "Perpanjangan hanya diizinkan jika tidak ada reservasi (Vormerkung) dari peminjam lain.",
             evidenceQuote: "Eine Verlängerung ist bis zu zweimal möglich, sofern keine Vormerkung durch einen anderen Leser vorliegt."
+          },
+          {
+            id: "les-b-t5-q18",
+            teil: 5,
+            questionNumber: 18,
+            questionText: "Welche Getränke dürfen Nutzer an ihren Arbeitsplatz im Lesesaal mitbringen?",
+            options: [
+              "Heißer Kaffee im Becher.",
+              "Ausschließlich Wasser in wiederverschließbaren Flaschen.",
+              "Jede Art von Erfrischungsgetränken und Snacks."
+            ],
+            correctAnswer: "Ausschließlich Wasser in wiederverschließbaren Flaschen.",
+            explanation: "Makanan dan minuman terbuka dilarang, hanya air dalam botol tertutup yang diizinkan.",
+            evidenceQuote: "...lediglich Wasser in verschließbaren Flaschen darf an die Arbeitsplätze mitgenommen werden."
           }
         ]
       }
@@ -649,7 +684,7 @@ Beitrag 2 (Mehmet): "Ich leide unter einer extremen Tierhaarallergie. Wenn ein K
   },
 
   // ==========================================
-  // PAKET C (CADANGAN 2)
+  // PAKET C (CADANGAN 2) - FULL 18 SOAL
   // ==========================================
   {
     packetId: "C",
@@ -665,7 +700,9 @@ Beitrag 2 (Mehmet): "Ich leide unter einer extremen Tierhaarallergie. Wenn ein K
 
 Wir buchten ein privates Schlafwagenabteil mit zwei Betten und eigenem kleinen Waschbecken. Pünktlich um 19:23 Uhr rollte der Zug aus dem Wiener Hauptbahnhof. Nach einem gemütlichen Abendessen im Speisewagen und angeregten Unterhaltungen mit Reisenden aus Italien und Japan schliefen wir beim sanften Rhythmus der Schienen ein. 
 
-Als wir am nächsten Morgen die Vorhänge öffneten, fuhren wir gerade durch die malerische Landschaft der Toskana. Eine freundliche Zugbegleiterin brachte uns heißen Kaffee und frische Croissants direkt ans Bett. Um 09:15 Uhr kamen wir ausgeruht mitten im Zentrum von Rom an – ohne Stress, ohne Transfer vom weit entfernten Flughafen und mit einem Bruchteil des CO2-Ausstoßes eines Fluges. Für uns steht fest: Unsere nächste Europareise machen wir wieder mit der Bahn!`,
+Als wir am nächsten Morgen die Vorhänge öffneten, fuhren wir gerade durch die malerische Landschaft der Toskana. Eine freundliche Zugbegleiterin brachte uns heißen Kaffee und frische Croissants direkt ans Bett. Um 09:15 Uhr kamen wir ausgeruht mitten im Zentrum von Rom an – ohne Stress, ohne Transfer vom weit entfernten Flughafen und mit einem Bruchteil des CO2-Ausstoßes eines Fluges. 
+
+Natürlich ist ein Schlafwagen kein Fünf-Sterne-Hotel: Die Gänge sind schmal, und wer einen sehr leichten Schlaf hat, sollte Ohropax einpacken. Doch das Gesamterlebnis hat uns absolut überzeugt. Für uns steht fest: Unsere nächste Europareise machen wir wieder mit der Bahn!`,
         questions: [
           {
             id: "les-c-t1-q1",
@@ -700,40 +737,112 @@ Als wir am nächsten Morgen die Vorhänge öffneten, fuhren wir gerade durch die
             correctAnswer: "Man kommt ausgeruht direkt im Stadtzentrum an und spart klimaschädliches CO2.",
             explanation: "Tiba di pusat kota tanpa transfer bandara serta jauh lebih ramah lingkungan (Bruchteil des CO2-Ausstoßes).",
             evidenceQuote: "Um 09:15 Uhr kamen wir ausgeruht mitten im Zentrum von Rom an – ohne Stress, ohne Transfer vom weit entfernten Flughafen und mit einem Bruchteil des CO2-Ausstoßes..."
+          },
+          {
+            id: "les-c-t1-q4",
+            teil: 1,
+            questionNumber: 4,
+            questionText: "Das Frühstück im Nachtzug...",
+            options: [
+              "musste extra im Speisewagen gegen Barzahlung gekauft werden.",
+              "wurde vom Zugpersonal direkt ins eigene Abteil gebracht.",
+              "fiel wegen Personalmangels komplett aus."
+            ],
+            correctAnswer: "wurde vom Zugpersonal direkt ins eigene Abteil gebracht.",
+            explanation: "Pramugari kereta membawakan kopi hangat dan croissant langsung ke tempat tidur mereka di kompartemen.",
+            evidenceQuote: "Eine freundliche Zugbegleiterin brachte uns heißen Kaffee und frische Croissants direkt ans Bett."
+          },
+          {
+            id: "les-c-t1-q5",
+            teil: 1,
+            questionNumber: 5,
+            questionText: "Für wen empfiehlt der Autor besondere Vorbereitung (z.B. Ohropax)?",
+            options: [
+              "Für Personen, die einen sehr leichten Schlaf haben.",
+              "Für Reisende ohne gültigen Reisepass.",
+              "Für Fahrgäste mit Hunden."
+            ],
+            correctAnswer: "Für Personen, die einen sehr leichten Schlaf haben.",
+            explanation: "Penulis menyarankan penyumbat telinga bagi mereka yang tidurnya sangat peka terhadap suara gerbong kereta.",
+            evidenceQuote: "...wer einen sehr leichten Schlaf hat, sollte Ohropax einpacken."
+          },
+          {
+            id: "les-c-t1-q6",
+            teil: 1,
+            questionNumber: 6,
+            questionText: "Wie lautet das Fazit der Reise?",
+            options: [
+              "Sie werden nie wieder mit dem Zug durch Europa reisen.",
+              "Das Gesamterlebnis war so positiv, dass sie ihre nächste Reise wieder mit der Bahn planen.",
+              "Sie empfehlen ausschließlich Flüge für Strecken über 500 Kilometer."
+            ],
+            correctAnswer: "Das Gesamterlebnis war so positiv, dass sie ihre nächste Reise wieder mit der Bahn planen.",
+            explanation: "Pengalaman menyenangkan membuat mereka mantap akan kembali berlibur dengan kereta api berikutnya.",
+            evidenceQuote: "Für uns steht fest: Unsere nächste Europareise machen wir wieder mit der Bahn!"
           }
         ]
       },
       {
         teil: 2,
-        title: "Teil 2: Artikel über Künstliche Intelligenz in Schulen",
-        instruction: "Lesen Sie den Beitrag und beantworten Sie die Fragen mit A, B oder C.",
+        title: "Teil 2: Pressebericht über Bildung & Digitalisierung",
+        instruction: "Lesen Sie den Beitrag und beantworten Sie die Fragen 7 bis 9 mit A, B oder C.",
         textTitle: "Künstliche Intelligenz im Klassenzimmer: Chance oder Gefahr für das Lernen?",
-        readingText: `Seit dem Durchbruch intelligenter Sprachmodelle diskutieren Lehrerverbände und Eltern intensiv über deren Einsatz im Schulalltag. Auf Knopfdruck formulieren Apps fehlerfreie Aufsätze, lösen komplexe Matheaufgaben und übersetzen historische Texte.
+        readingText: `Seit dem weltweiten Durchbruch intelligenter Sprachmodelle diskutieren Lehrerverbände, Universitäten und Eltern intensiv über deren Einsatz im Schulalltag. Auf einfachen Knopfdruck formulieren Apps fehlerfreie Aufsätze, lösen komplexe Gleichungen und übersetzen anspruchsvolle historische Texte.
 
-Pädagogen betonen, dass ein Verbot von KI-Werkzeugen wenig sinnvoll sei, da Schüler sie außerhalb des Klassenzimmers ohnehin nutzen werden. Stattdessen gehe es darum, Schülern Medienkompetenz und kritisches Denken zu vermitteln: Sie müssen lernen, Fakten zu überprüfen, KI-Halluzinationen zu erkennen und eigene Argumente eigenständig zu formulieren.`,
+Viele Lehrer befürchteten anfangs, dass Schüler das selbstständige Denken und Schreiben verlernen könnten. Doch eine bundesweite Erhebung an Gymnasien zeigt ein differenzierteres Bild: Wo KI gezielt in den Unterricht integriert wird – etwa zur Textkorrektur oder als virtueller Sparringspartner für fremdsprachige Dialoge –, steigt die Motivation der Lernenden deutlich an.
+
+Pädagogen betonen einhellig, dass ein Verbot von KI-Werkzeugen wenig sinnvoll sei, da Schüler sie außerhalb des Klassenzimmers ohnehin nutzen werden. Stattdessen gehe es darum, Schülern Medienkompetenz und kritisches Denken zu vermitteln: Sie müssen lernen, Fakten sorgfältig zu überprüfen, KI-Halluzinationen zu erkennen und eigene Standpunkte überzeugend zu begründen.`,
         questions: [
           {
-            id: "les-c-t2-q4",
+            id: "les-c-t2-q7",
             teil: 2,
-            questionNumber: 4,
-            questionText: "Welche Haltung vertreten viele Pädagogen bezüglich KI in der Schule?",
+            questionNumber: 7,
+            questionText: "Welche anfängliche Sorge hatten viele Lehrkräfte bezüglich intelligenter Sprachmodelle?",
             options: [
-              "Sie fordern die sofortige Abschaltung des Internets an allen Schulen.",
-              "Sie halten Verbote für ineffektiv und wollen Schüler zu einem kritischen Umgang anleiten.",
-              "Sie möchten alle schriftlichen Prüfungen dauerhaft abschaffen."
+              "Dass Schüler das eigenständige Nachdenken und Verfassen von Texten verlernen.",
+              "Dass alle Schulen neue Großrechner anschaffen müssen.",
+              "Dass keine Fremdsprachenlehrer mehr benötigt werden."
             ],
-            correctAnswer: "Sie halten Verbote für ineffektiv und wollen Schüler zu einem kritischen Umgang anleiten.",
-            explanation: "Pakar pendidikan menganggap pelarangan tidak efektif dan lebih penting mengajarkan literasi media serta verifikasi data.",
-            evidenceQuote: "Pädagogen betonen, dass ein Verbot von KI-Werkzeugen wenig sinnvoll sei... Stattdessen gehe es darum, Schülern Medienkompetenz und kritisches Denken zu vermitteln..."
+            correctAnswer: "Dass Schüler das eigenständige Nachdenken und Verfassen von Texten verlernen.",
+            explanation: "Guru awalnya khawatir murid tidak lagi belajar berpikir kritis dan menulis secara mandiri.",
+            evidenceQuote: "Viele Lehrer befürchteten anfangs, dass Schüler das selbstständige Denken und Schreiben verlernen könnten."
+          },
+          {
+            id: "les-c-t2-q8",
+            teil: 2,
+            questionNumber: 8,
+            questionText: "Was zeigt die erwähnte Erhebung an Schulen, die KI konstruktiv einbinden?",
+            options: [
+              "Die Noten der Schüler verschlechtern sich massiv.",
+              "Die Lernmotivation der Jugendlichen nimmt spürbar zu.",
+              "Schüler weigern sich, Hausaufgaben zu machen."
+            ],
+            correctAnswer: "Die Lernmotivation der Jugendlichen nimmt spürbar zu.",
+            explanation: "Saat AI diintegrasikan sebagai rekan latihan dialog atau koreksi teks, motivasi belajar murid justru meningkat nyata.",
+            evidenceQuote: "...steigt die Motivation der Lernenden deutlich an."
+          },
+          {
+            id: "les-c-t2-q9",
+            teil: 2,
+            questionNumber: 9,
+            questionText: "Welches Fazit ziehen Pädagogen laut dem Artikel?",
+            options: [
+              "Sie fordern die sofortige Abschaltung aller digitalen Geräte an Schulen.",
+              "Verbote sind ineffektiv; Schüler müssen stattdessen Medienkompetenz und Quellenkritik lernen.",
+              "Klassische Prüfungen sollen durch automatische KI-Tests ersetzt werden."
+            ],
+            correctAnswer: "Verbote sind ineffektiv; Schüler müssen stattdessen Medienkompetenz und Quellenkritik lernen.",
+            explanation: "Pakar pendidikan sepakat pelarangan tidak berguna dan literasi memverifikasi fakta serta mengenali halusinasi AI jauh lebih penting.",
+            evidenceQuote: "Pädagogen betonen einhellig, dass ein Verbot von KI-Werkzeugen wenig sinnvoll sei... Stattdessen gehe es darum, Schülern Medienkompetenz und kritisches Denken zu vermitteln..."
           }
         ]
       },
       {
         teil: 3,
         title: "Teil 3: Praktikumsanzeigen & Bewerber",
-        instruction: "Welche Praktikumsanzeige passt zur Situation? Wählen Sie A, B oder 0.",
-        textTitle: "Praktikumsplätze in Berlin",
-        readingText: "Zuordnung von Praktika.",
+        instruction: "Welche Praktikumsanzeige passt zur Situation? Wählen Sie A, B, C atau 0.",
+        textTitle: "Praktikumsplätze und Weiterbildung in Berlin",
+        readingText: "Ordnen Sie die Angebote den Bewerbern zu.",
         matchingAds: [
           {
             id: "ad-c-A",
@@ -743,69 +852,169 @@ Pädagogen betonen, dass ein Verbot von KI-Werkzeugen wenig sinnvoll sei, da Sch
           {
             id: "ad-c-B",
             title: "Anzeige B: Praktikum Softwareentwicklung (Python)",
-            text: "Spannende Aufgaben im Bereich Datenanalyse und Backend-Entwicklung für Informatik-Studenten. Mindestens 6 Monate Vollzeit. Fließendes Englisch erforderlich."
+            text: "Spannende Aufgaben im Bereich Datenanalyse und Backend-Entwicklung für Informatik-Studenten. Mindestens 6 Monate Vollzeit. Fließendes Englisch erforderlich. Arbeitsort Berlin-Mitte."
+          },
+          {
+            id: "ad-c-C",
+            title: "Anzeige C: Teilzeit-Volontariat im Umweltschutzverband",
+            text: "Mitarbeit bei Baumpflanzaktionen und Bildungskampagnen. 20 Wochenstunden, flexible Zeiteinteilung, Dauer: 4 Monate. Auch für Quereinsteiger ohne Fachstudium geeignet."
           }
         ],
         matchingSituations: [
           {
-            id: "sit-c-7",
-            person: "7. Lisa (22)",
-            need: "studiert Germanistik und Theaterwissenschaften, sucht für die Sommermonate ein 3-monatiges Praktikum im Event- und Kulturbereich.",
+            id: "sit-c-10",
+            person: "10. Lisa (22)",
+            need: "studiert Germanistik und Theaterwissenschaften, sucht für die Sommermonate ein 3-monatiges bezahltes Praktikum im Event- und Kulturbereich.",
             correctAdId: "ad-c-A"
+          },
+          {
+            id: "sit-c-11",
+            person: "11. Dennis (25)",
+            need: "studiert Informatik und möchte für mindestens ein halbes Jahr praktische Programmiererfahrung mit Python in Vollzeit sammeln.",
+            correctAdId: "ad-c-B"
+          },
+          {
+            id: "sit-c-12",
+            person: "12. Claudia (35)",
+            need: "sucht ein Vollzeit-Praktikum für genau 2 Monate im Bereich Bankwesen und Börsenhandel.",
+            correctAdId: "0"
           }
         ],
         questions: [
           {
-            id: "les-c-t3-q7",
+            id: "les-c-t3-q10",
             teil: 3,
-            questionNumber: 7,
-            questionText: "Welche Anzeige passt zu Lisa (Germanistik/Theater, 3 Monate, Sommer)?",
-            options: ["Anzeige A", "Anzeige B", "0 (Keine passende Anzeige)"],
+            questionNumber: 10,
+            questionText: "Welche Anzeige passt zu Lisa (Germanistik/Theater, 3 Monate ab Mai)?",
+            options: ["Anzeige A", "Anzeige B", "Anzeige C", "0 (Keine passende Anzeige)"],
             correctAnswer: "Anzeige A",
-            explanation: "Anzeige A cocok persis: Theaterfestival, 3 Monate ab Mai, Künstlerbetreuung und Social Media.",
+            explanation: "Anzeige A cocok persis: Theaterfestival, 3 Monate ab Mai, Künstlerbetreuung dan Social Media.",
             evidenceQuote: "Unterstütze unser Theaterfestival für 3 Monate ab Mai!"
+          },
+          {
+            id: "les-c-t3-q11",
+            teil: 3,
+            questionNumber: 11,
+            questionText: "Welche Anzeige passt zu Dennis (Informatik, min. 6 Monate Vollzeit, Python)?",
+            options: ["Anzeige A", "Anzeige B", "Anzeige C", "0 (Keine passende Anzeige)"],
+            correctAnswer: "Anzeige B",
+            explanation: "Anzeige B pas: Softwareentwicklung Python, min 6 Monate Vollzeit untuk mahasiswa informatika.",
+            evidenceQuote: "Spannende Aufgaben im Bereich Datenanalyse und Backend-Entwicklung für Informatik-Studenten. Mindestens 6 Monate Vollzeit."
+          },
+          {
+            id: "les-c-t3-q12",
+            teil: 3,
+            questionNumber: 12,
+            questionText: "Welche Anzeige passt zu Claudia (Bankwesen / Börse, 2 Monate)?",
+            options: ["Anzeige A", "Anzeige B", "Anzeige C", "0 (Keine passende Anzeige)"],
+            correctAnswer: "0 (Keine passende Anzeige)",
+            explanation: "Tidak ada iklan yang menawarkan magang di sektor perbankan atau pasar modal.",
+            evidenceQuote: "Keine passende Bank- oder Börsenanzeige vorhanden."
           }
         ]
       },
       {
         teil: 4,
         title: "Teil 4: Meinungen zur 4-Tage-Woche",
-        instruction: "Ist die Person DAFÜR oder DAGEGEN?",
-        textTitle: "4-Tage-Woche bei vollem Lohnausgleich?",
-        readingText: `Beitrag (Felix, Manager): "Wir haben die 4-Tage-Woche in unserer Agentur getestet. Das Ergebnis: Die Mitarbeiter sind ausgeruhter, seltener krank und schaffen in 32 Stunden qualitativ dieselbe Arbeit wie früher in 40 Stunden. Ich bin begeistert!"`,
+        instruction: "Lesen Sie die Meinungen zum Thema: 'Einführung der 4-Tage-Woche bei vollem Lohnausgleich'. Ist die Person DAFÜR (Ja) oder DAGEGEN (Nein)?",
+        textTitle: "Debatte: 4-Tage-Woche – Zukunft der Arbeit oder Gefahr für die Wirtschaft?",
+        readingText: `Thema der Woche: Sollten Unternehmen flächendeckend die 4-Tage-Woche bei gleichem Gehalt einführen?
+
+Leserbrief 1 (Felix, Agenturinhaber):
+"Wir haben die 4-Tage-Woche in unserer Agentur vor einem Jahr testweise eingeführt. Das Ergebnis übertrifft alle Erwartungen: Die Mitarbeiter sind ausgeruhter, seltener krank und schaffen in 32 Stunden qualitativ dieselbe Arbeit wie früher in 40 Stunden. Die Motivation ist riesig. Ich bin restlos begeistert!"
+
+Leserbrief 2 (Monika, Gastronomin und Hotelchefin):
+"In Büros mag das funktionieren, aber in Dienstleistungsbetrieben ist das eine Illusion! Ein Hotel oder Restaurant kann nicht einfach freitags schließen. Wenn ich für denselben Lohn weniger Stunden arbeiten lasse, muss ich teures Zusatzpersonal einstellen, das es auf dem Arbeitsmarkt gar nicht gibt. Die Preise müssten explodieren. Ich bin strikt dagegen!"
+
+Leserbrief 3 (Dr. Krause, Arbeitspsychologe):
+"Drei Tage Erholung am Stück senken das Burnout-Risiko nachweislich und geben Eltern mehr Zeit für die Erziehung und Pflege von Angehörigen. Aus gesundheitspolitischer Sicht ist die Verkürzung der Wochenarbeitszeit eine überfällige Anpassung an die moderne Leistungsgesellschaft."`,
         questions: [
           {
-            id: "les-c-t4-q8",
+            id: "les-c-t4-q13",
             teil: 4,
-            questionNumber: 8,
-            questionText: "Ist Felix DAFÜR (Ja) oder DAGEGEN (Nein)?",
+            questionNumber: 13,
+            questionText: "Ist Felix (Agenturinhaber) DAFÜR (Ja) oder DAGEGEN (Nein)?",
             options: ["Dafür (Ja)", "Dagegen (Nein)"],
             correctAnswer: "Dafür (Ja)",
-            explanation: "Felix sangat puas ('Ich bin begeistert!') karena produktivitas tetap dan pegawai lebih bugar.",
-            evidenceQuote: "Ich bin begeistert!"
+            explanation: "Felix sangat puas ('Ich bin restlos begeistert!') karena produktivitas tetap sama dan pegawai lebih bugar.",
+            evidenceQuote: "Ich bin restlos begeistert!"
+          },
+          {
+            id: "les-c-t4-q14",
+            teil: 4,
+            questionNumber: 14,
+            questionText: "Ist Monika (Gastronomin) DAFÜR (Ja) oder DAGEGEN (Nein)?",
+            options: ["Dafür (Ja)", "Dagegen (Nein)"],
+            correctAnswer: "Dagegen (Nein)",
+            explanation: "Monika menolak secara tegas ('Ich bin strikt dagegen!') karena sektor hotel/restoran tidak bisa tutup dan biaya gaji akan membengkak.",
+            evidenceQuote: "Ich bin strikt dagegen!"
+          },
+          {
+            id: "les-c-t4-q15",
+            teil: 4,
+            questionNumber: 15,
+            questionText: "Ist Dr. Krause (Arbeitspsychologe) DAFÜR (Ja) oder DAGEGEN (Nein)?",
+            options: ["Dafür (Ja)", "Dagegen (Nein)"],
+            correctAnswer: "Dafür (Ja)",
+            explanation: "Dr. Krause mendukung karena 3 hari libur menurunkan risiko burnout dan meningkatkan kesehatan mental pekerja.",
+            evidenceQuote: "...ist die Verkürzung der Wochenarbeitszeit eine überfällige Anpassung..."
           }
         ]
       },
       {
         teil: 5,
         title: "Teil 5: Parkplatzordnung am Bahnhof",
-        instruction: "Lesen Sie die Parkplatzordnung.",
+        instruction: "Lesen Sie die Parkplatzordnung und beantworten Sie die Aufgaben 16 bis 18 dazu.",
         textTitle: "Park & Ride Parkplatzordnung Bahnhof Kassel-Wilhelmshöhe",
-        readingText: `§ 2 Parkberechtigung: Die Nutzung dieses Parkplatzes ist ausschließlich Pendlern mit gültigem tagesaktuellem Bahnticket oder Monatsabonnement der Deutschen Bahn gestattet. Das Ticket muss gut sichtbar hinter der Windschutzscheibe platziert werden. Die Höchstparkdauer beträgt 72 Stunden.`,
+        readingText: `§ 2 Parkberechtigung und Tarife
+1. Die Nutzung dieses Park & Ride Parkplatzes ist ausschließlich Pendlern und Bahnreisenden mit gültigem tagesaktuellem Bahnticket oder Monatsabonnement der Deutschen Bahn bzw. des regionalen Verkehrsverbundes gestattet.
+2. Der gültige Parkschein muss zusammen mit der Fahrkarte von außen gut lesbar hinter der Windschutzscheibe des Fahrzeugs platziert werden.
+3. Die Höchstparkdauer beträgt 72 Stunden (3 Tage). Längeres Parken bedarf einer vorherigen schriftlichen Genehmigung der Bahnhofsverwaltung.
+
+§ 5 Abschleppen und Verstöße
+Fahrzeuge, die ohne gültigen Nachweis parken, die Rettungswege versperren oder markierte Behindertenparkplätze unberechtigt belegen, werden unverzüglich auf Kosten des Fahrzeughalters kostenpflichtig abgeschleppt.`,
         questions: [
           {
-            id: "les-c-t5-q9",
+            id: "les-c-t5-q16",
             teil: 5,
-            questionNumber: 9,
+            questionNumber: 16,
             questionText: "Wer darf auf dem P&R-Parkplatz parken?",
             options: [
               "Jeder Besucher der Stadt Kassel ohne Einschränkung.",
-              "Nur Bahnreisende mit einem gültigen Zugticket.",
-              "Nur Mitarbeiter der Bahn."
+              "Nur Bahnreisende und Pendler mit einem gültigen Ticket des Verkehrsverbundes.",
+              "Ausschließlich Mitarbeiter der Deutschen Bahn."
             ],
-            correctAnswer: "Nur Bahnreisende mit einem gültigen Zugticket.",
+            correctAnswer: "Nur Bahnreisende und Pendler mit einem gültigen Ticket des Verkehrsverbundes.",
             explanation: "Hanya penumpang kereta api dengan tiket harian atau tiket bulanan sah yang berhak parkir.",
             evidenceQuote: "Die Nutzung dieses Parkplatzes ist ausschließlich Pendlern mit gültigem tagesaktuellem Bahnticket..."
+          },
+          {
+            id: "les-c-t5-q17",
+            teil: 5,
+            questionNumber: 17,
+            questionText: "Wie lange darf ein Auto regulär maximal auf dem Parkplatz stehen?",
+            options: [
+              "Höchstens 24 Stunden.",
+              "Maximal 72 Stunden (3 Tage).",
+              "Unbegrenzt lange, solange man bezahlt hat."
+            ],
+            correctAnswer: "Maximal 72 Stunden (3 Tage).",
+            explanation: "Batas durasi parkir maksimal reguler adalah 72 jam (3 hari).",
+            evidenceQuote: "Die Höchstparkdauer beträgt 72 Stunden (3 Tage)."
+          },
+          {
+            id: "les-c-t5-q18",
+            teil: 5,
+            questionNumber: 18,
+            questionText: "Was passiert mit Fahrzeugen, die ohne Berechtigung Behindertenparkplätze belegen?",
+            options: [
+              "Sie erhalten eine mündliche Verwarnung per Lautsprecher.",
+              "Sie werden sofort kostenpflichtig für den Halter abgeschleppt.",
+              "Sie müssen lediglich die doppelte Parkgebühr am Automaten nachzahlen."
+            ],
+            correctAnswer: "Sie werden sofort kostenpflichtig untuk den Halter abgeschleppt.",
+            explanation: "Kendaraan tanpa hak di parkir disabilitas langsung diderek dengan biaya ditanggung pemilik mobil.",
+            evidenceQuote: "...werden unverzüglich auf Kosten des Fahrzeughalters kostenpflichtig abgeschleppt."
           }
         ]
       }

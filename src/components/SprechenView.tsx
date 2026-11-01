@@ -77,6 +77,12 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
     initialSprechenPackets.find((p) => p.packetId === activePacketId) || initialSprechenPackets[0];
   const currentTopic = packet.teil2Topics[selectedTopicIndex] || packet.teil2Topics[0];
 
+  const handleTeilChange = (teilNum: 1 | 2 | 3) => {
+    speechPlayer.stop();
+    setIsPartnerSpeaking(false);
+    setActiveTeil(teilNum);
+  };
+
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -164,7 +170,13 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
               <button
                 key={pid}
                 type="button"
-                onClick={() => setActivePacketId(pid)}
+                onClick={() => {
+                  if (activePacketId === pid) return;
+                  if (isRecording) stopRecording();
+                  speechPlayer.stop();
+                  setIsPartnerSpeaking(false);
+                  setActivePacketId(pid);
+                }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activePacketId === pid
                     ? "bg-amber-600 text-white shadow-xs"
@@ -217,7 +229,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={() => setActiveTeil(1)}
+          onClick={() => handleTeilChange(1)}
           className={`flex-1 p-3 rounded-2xl border text-left transition-all ${
             activeTeil === 1
               ? "bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-900 dark:text-amber-100 font-bold shadow-xs"
@@ -232,7 +244,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
 
         <button
           type="button"
-          onClick={() => setActiveTeil(2)}
+          onClick={() => handleTeilChange(2)}
           className={`flex-1 p-3 rounded-2xl border text-left transition-all ${
             activeTeil === 2
               ? "bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-900 dark:text-amber-100 font-bold shadow-xs"
@@ -247,7 +259,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
 
         <button
           type="button"
-          onClick={() => setActiveTeil(3)}
+          onClick={() => handleTeilChange(3)}
           className={`flex-1 p-3 rounded-2xl border text-left transition-all ${
             activeTeil === 3
               ? "bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-900 dark:text-amber-100 font-bold shadow-xs"

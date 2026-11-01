@@ -133,11 +133,19 @@ export const b1Dictionary: DictionaryEntry[] = [
 export const findB1Word = (word: string): DictionaryEntry | undefined => {
   const clean = word.replace(/[.,/#!$%^&*;:{}=\-_`~()?"'„“]/g, "").trim();
   if (!clean || clean.length < 3) return undefined;
+
+  const lowerClean = clean.toLowerCase();
+
+  // 1. Exact match (case-insensitive)
+  const exact = b1Dictionary.find(
+    (entry) => entry.german.toLowerCase() === lowerClean
+  );
+  if (exact) return exact;
+
+  // 2. Inflected forms (plurals, case endings, e.g. "Erfahrungen" -> "Erfahrung", "Abiturs" -> "Abitur")
+  // Only match if the dictionary root is at least 4 characters and the word starts with that root
   return b1Dictionary.find((entry) => {
-    return (
-      entry.german.toLowerCase() === clean.toLowerCase() ||
-      entry.german.toLowerCase().startsWith(clean.toLowerCase()) ||
-      clean.toLowerCase().startsWith(entry.german.toLowerCase())
-    );
+    const entryLower = entry.german.toLowerCase();
+    return entryLower.length >= 4 && lowerClean.startsWith(entryLower);
   });
 };
