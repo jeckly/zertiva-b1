@@ -9,7 +9,7 @@ import {
   Moon,
   Sun,
   Menu,
-  GraduationCap
+  GraduationCap,
 } from "lucide-react";
 
 interface NavbarProps {
@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isDark, setIsDark] = useState<boolean>(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("zertiva_theme");
+    const saved = localStorage.getItem("gmb1_theme") || localStorage.getItem("zertiva_theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     if (saved === "dark" || (!saved && prefersDark)) {
       document.documentElement.classList.add("dark");
@@ -40,11 +40,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   const toggleDarkMode = () => {
     if (isDark) {
       document.documentElement.classList.remove("dark");
-      localStorage.setItem("zertiva_theme", "light");
+      localStorage.setItem("gmb1_theme", "light");
       setIsDark(false);
     } else {
       document.documentElement.classList.add("dark");
-      localStorage.setItem("zertiva_theme", "dark");
+      localStorage.setItem("gmb1_theme", "dark");
       setIsDark(true);
     }
   };
@@ -52,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const level = Math.floor(stats.xp / 100) + 1;
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md transition-colors">
+    <header className="sticky top-0 z-30 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md transition-colors print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Left: Mobile hamburger & Logo */}
         <div className="flex items-center gap-3">
@@ -71,15 +71,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
-                  Zertiva B1
+                <span className="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
+                  GoetheMeister B1
                 </span>
                 <span className="hidden sm:inline-flex px-2 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300/40 dark:border-amber-700/50">
-                  GOETHE B1
+                  GMB1 STUDIO
                 </span>
               </div>
               <p className="text-[10px] text-zinc-600 dark:text-zinc-400 hidden sm:block font-medium">
-                Personal Studio & Exam Simulator
+                Official Goethe-Zertifikat B1 Exam Studio
               </p>
             </div>
           </div>

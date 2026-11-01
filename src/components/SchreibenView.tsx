@@ -1,9 +1,15 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { UserStats, SchreibenAufgabe } from "@/types";
+import { UserStats } from "@/types";
 import { initialSchreibenPackets } from "@/data/schreibenData";
-import { saveExamResult } from "@/lib/storage";
+import {
+  saveExamResult,
+  saveActiveExamSession,
+  getActiveExamSession,
+  clearActiveExamSession,
+  ACTIVE_SCHREIBEN_KEY,
+} from "@/lib/storage";
 import { UmlautHelperBar } from "./UmlautHelperBar";
 import {
   Timer,
@@ -11,13 +17,12 @@ import {
   Square,
   BookOpen,
   Sparkles,
-  HelpCircle,
-  RotateCcw,
   CheckCircle2,
   AlertCircle,
-  Copy,
   ChevronDown,
   ChevronUp,
+  AlertTriangle,
+  RotateCcw,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -43,9 +48,11 @@ const B1_CONNECTORS = [
   "außerdem",
   "darüber hinaus",
   "nicht nur",
-  "sondern auch",
+  "sondern",
   "einerseits",
   "andererseits",
+  "während",
+  "anstatt",
 ];
 
 export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
@@ -59,16 +66,51 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
   const [checkedPoints, setCheckedPoints] = useState<Record<string, boolean>>({});
   const [showRedemittel, setShowRedemittel] = useState<boolean>(false);
   const [isEvaluated, setIsEvaluated] = useState<boolean>(false);
-  const [timeLeft, setTimeLeft] = useState<number>(60 * 60); // 60 minutes
+  const [timeLeft, setTimeLeft] = useState<number>(60 * 60); // 60 mins
   const [timerRunning, setTimerRunning] = useState<boolean>(true);
+  const [sessionRestored, setSessionRestored] = useState<boolean>(false);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // Restore active session on mount
   useEffect(() => {
-    if (stats.activePacket === "A" || stats.activePacket === "B" || stats.activePacket === "C") {
+    const saved = getActiveExamSession<{
+      userTexts?: Record<number, string>;
+      checkedPoints?: Record<string, boolean>;
+      activeAufgabeNum?: 1 | 2 | 3;
+    }>(ACTIVE_SCHREIBEN_KEY);
+
+    if (saved && !saved.isSubmitted) {
+      setActivePacketId(saved.packetId);
+      if (saved.extraData?.userTexts) setUserTexts(saved.extraData.userTexts);
+      if (saved.extraData?.checkedPoints) setCheckedPoints(saved.extraData.checkedPoints);
+      if (saved.extraData?.activeAufgabeNum) setActiveAufgabeNum(saved.extraData.activeAufgabeNum);
+      setTimeLeft(saved.timeLeft || 60 * 60);
+      setIsEvaluated(saved.isSubmitted || false);
+      setSessionRestored(true);
+    } else if (
+      stats.activePacket === "A" ||
+      stats.activePacket === "B" ||
+      stats.activePacket === "C"
+    ) {
       setActivePacketId(stats.activePacket);
     }
   }, [stats.activePacket]);
+
+  // Realtime Auto-Save
+  useEffect(() => {
+    if (isEvaluated) return;
+    saveActiveExamSession(ACTIVE_SCHREIBEN_KEY, {
+      packetId: activePacketId,
+      mode: "exam",
+      answers: {},
+      timeLeft,
+      currentTeilIndex: activeAufgabeNum,
+      isSubmitted: isEvaluated,
+      extraData: { userTexts, checkedPoints, activeAufgabeNum },
+      lastUpdated: new Date().toISOString(),
+    });
+  }, [activePacketId, userTexts, checkedPoints, activeAufgabeNum, timeLeft, isEvaluated]);
 
   // Timer countdown
   useEffect(() => {
@@ -86,8 +128,10 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
     return () => clearInterval(interval);
   }, [timerRunning, isEvaluated]);
 
-  const packet = initialSchreibenPackets.find((p) => p.packetId === activePacketId) || initialSchreibenPackets[0];
-  const currentAufgabe = packet.aufgaben.find((a) => a.aufgabeNumber === activeAufgabeNum) || packet.aufgaben[0];
+  const packet =
+    initialSchreibenPackets.find((p) => p.packetId === activePacketId) || initialSchreibenPackets[0];
+  const currentAufgabe =
+    packet.aufgaben.find((a) => a.aufgabeNumber === activeAufgabeNum) || packet.aufgaben[0];
 
   const currentText = userTexts[activeAufgabeNum] || "";
 
@@ -100,7 +144,12 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
 
   const wordCount = countWords(currentText);
 
-  // Word count color badge
+  // Word count percentage towards target
+  const wordPercentage = Math.min(
+    100,
+    Math.round((wordCount / currentAufgabe.targetWords) * 100)
+  );
+
   const getWordCountColor = () => {
     if (wordCount === 0) return "text-zinc-600 dark:text-zinc-400";
     if (wordCount < currentAufgabe.minWords) return "text-rose-500 font-bold";
@@ -129,7 +178,6 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
       [activeAufgabeNum]: newText,
     }));
 
-    // Restore focus and cursor position
     setTimeout(() => {
       el.focus();
       el.setSelectionRange(start + char.length, start + char.length);
@@ -144,8 +192,8 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
     currentAufgabe.type === "informell"
       ? /liebe|lieber|hallo/i.test(currentText)
       : currentAufgabe.type === "formell"
-      ? /sehr geehrte/i.test(currentText)
-      : true; // Meinungsbeitrag doesn't mandate formal salutation
+      ? /sehr geehrte|guten tag/i.test(currentText)
+      : true;
 
   const hasClosing =
     currentAufgabe.type === "informell"
@@ -161,9 +209,9 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
   const handleEvaluate = () => {
     setIsEvaluated(true);
     setTimerRunning(false);
+    clearActiveExamSession(ACTIVE_SCHREIBEN_KEY);
 
-    // Calculate heuristic score (0-100)
-    let score = 40; // baseline
+    let score = 40;
     if (wordCount >= currentAufgabe.minWords && wordCount <= currentAufgabe.maxWords) {
       score += 25;
     } else if (wordCount >= currentAufgabe.minWords - 10) {
@@ -171,7 +219,7 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
     }
 
     // Connectors score (up to 20 pts)
-    score += Math.min(20, detectedConnectors.length * 5);
+    score += Math.min(20, detectedConnectors.length * 6);
 
     // Salutation & closing (up to 15 pts)
     if (hasGreeting) score += 7;
@@ -194,6 +242,24 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
     }
   };
 
+  const handleResetExam = (confirmFresh = true) => {
+    if (
+      confirmFresh &&
+      wordCount > 0 &&
+      !isEvaluated &&
+      !window.confirm("Yakin ingin mereset tulisan Schreiben Anda?")
+    ) {
+      return;
+    }
+    clearActiveExamSession(ACTIVE_SCHREIBEN_KEY);
+    setUserTexts({ 1: "", 2: "", 3: "" });
+    setCheckedPoints({});
+    setTimeLeft(60 * 60);
+    setTimerRunning(true);
+    setIsEvaluated(false);
+    setSessionRestored(false);
+  };
+
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -202,6 +268,22 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Session Restored Banner */}
+      {sessionRestored && !isEvaluated && (
+        <div className="p-3.5 px-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-semibold flex items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Sesi menulis Schreiben sebelumnya otomatis dipulihkan dari LocalStorage.</span>
+          </div>
+          <button
+            onClick={() => handleResetExam(true)}
+            className="text-[11px] font-bold text-amber-900 dark:text-amber-100 underline hover:no-underline"
+          >
+            Mulai Dari Awal
+          </button>
+        </div>
+      )}
+
       {/* Top Header & Navigation */}
       <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs flex flex-wrap items-center justify-between gap-4">
         {/* Packet tabs & Title */}
@@ -213,7 +295,7 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
                 type="button"
                 onClick={() => {
                   setActivePacketId(pid);
-                  setIsEvaluated(false);
+                  handleResetExam(false);
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activePacketId === pid
@@ -231,7 +313,7 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
               {packet.title} - Goethe B1 Schreiben
             </h2>
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-              3 Aufgaben • Total 60 Menit • Rubrik Penilaian Mandiri
+              3 Aufgaben • Total 60 Menit • Rubrik Evaluasi Cerdas
             </p>
           </div>
         </div>
@@ -274,9 +356,9 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
         ))}
       </div>
 
-      {/* Main Workspace Grid (Left: Prompt & Redemittel, Right: Text Editor & Evaluator) */}
+      {/* Main Workspace Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Prompt & Guidelines (5 cols) */}
+        {/* Left Column: Prompt, Guidelines & Redemittel (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
             <div>
@@ -292,7 +374,7 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
               {currentAufgabe.promptText}
             </div>
 
-            {/* Content Points Checklist (Selbstevaluation) */}
+            {/* Content Points Checklist */}
             <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
               <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                 Checklist Poin Isi (Wajib Dijawab):
@@ -352,21 +434,30 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
           </div>
         </div>
 
-        {/* Right Column: Writing Editor & Evaluator (7 cols) */}
+        {/* Right Column: Writing Editor & Smart Live Evaluator (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
-            {/* Header with Word Counter & Umlaut Bar */}
+            {/* Header: Dynamic Word Target & Umlauts */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-zinc-100 dark:border-zinc-800">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
-                  Jumlah Kata:
-                </span>
-                <span className={`text-sm ${getWordCountColor()}`}>
-                  {wordCount} / ~{currentAufgabe.targetWords} kata
-                </span>
-                <span className="text-[10px] text-zinc-600 dark:text-zinc-400">
-                  (min {currentAufgabe.minWords} - max {currentAufgabe.maxWords})
-                </span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-zinc-500">Kata:</span>
+                  <span className={`text-sm ${getWordCountColor()}`}>
+                    {wordCount} / ~{currentAufgabe.targetWords}
+                  </span>
+                </div>
+                <div className="w-20 sm:w-28 h-2 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      wordCount >= currentAufgabe.minWords && wordCount <= currentAufgabe.maxWords
+                        ? "bg-emerald-500"
+                        : wordCount > currentAufgabe.maxWords
+                        ? "bg-amber-500"
+                        : "bg-rose-500"
+                    }`}
+                    style={{ width: `${wordPercentage}%` }}
+                  />
+                </div>
               </div>
 
               {/* Umlaut Helper Bar */}
@@ -387,27 +478,73 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
               className="w-full h-80 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-850/60 border border-zinc-200 dark:border-zinc-700/80 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-y font-mono leading-relaxed"
             />
 
-            {/* Real-time Connectors & Criteria Badges */}
-            <div className="flex flex-wrap items-center gap-2 text-xs pt-1">
-              <span className="font-semibold text-zinc-600 dark:text-zinc-400">Konnektoren B1:</span>
-              {detectedConnectors.length > 0 ? (
-                detectedConnectors.map((c, i) => (
+            {/* Smart Live Checklist: Connectors, Greeting, Closing */}
+            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 text-xs space-y-2.5">
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Salutation check */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-zinc-500">Sapaan Pembuka:</span>
+                  {hasGreeting ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-0.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Ada
+                    </span>
+                  ) : (
+                    <span className="text-rose-500 font-bold flex items-center gap-0.5">
+                      <AlertCircle className="w-3.5 h-3.5" /> Belum ada
+                    </span>
+                  )}
+                </div>
+
+                {/* Closing check */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-zinc-500">Salam Penutup:</span>
+                  {hasClosing ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-0.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Ada
+                    </span>
+                  ) : (
+                    <span className="text-rose-500 font-bold flex items-center gap-0.5">
+                      <AlertCircle className="w-3.5 h-3.5" /> Belum ada
+                    </span>
+                  )}
+                </div>
+
+                {/* Connectors count check */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-zinc-500">Variasi Konnektoren B1:</span>
                   <span
-                    key={i}
-                    className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-mono text-[11px] font-bold"
+                    className={`font-bold ${
+                      detectedConnectors.length >= 3
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-amber-500"
+                    }`}
                   >
-                    ✓ {c}
+                    {detectedConnectors.length} / min. 3 variasi
                   </span>
-                ))
-              ) : (
-                <span className="text-zinc-600 italic text-[11px]">
-                  Belum terdeteksi (gunakan weil, obwohl, trotzdem, deshalb, dll)
-                </span>
-              )}
+                </div>
+              </div>
+
+              {/* Detected connectors badges */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-zinc-200 dark:border-zinc-700/50">
+                {detectedConnectors.length > 0 ? (
+                  detectedConnectors.map((c, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-mono text-[11px] font-bold"
+                    >
+                      ✓ {c}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-zinc-500 italic text-[11px]">
+                    Belum ada konnektor terdeteksi (Gunakan: weil, obwohl, trotzdem, deshalb, falls, damit...)
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Evaluator & Musterlösung Side-by-Side Panel */}
+          {/* Evaluator Panel & Side-by-Side Musterlösung */}
           {isEvaluated && (
             <div className="p-6 rounded-3xl bg-zinc-900 text-white border border-zinc-700 shadow-xl space-y-4 animate-fade-in">
               <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
@@ -426,29 +563,33 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
                 </button>
               </div>
 
-              {/* Heuristic Scores breakdown */}
+              {/* Score Breakdown */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                 <div className="p-3 rounded-xl bg-zinc-800/80 border border-zinc-700">
-                  <div className="text-zinc-400">Jumlah Kata</div>
+                  <div className="text-zinc-400">Target Kata</div>
                   <div
                     className={`font-bold mt-1 ${
                       wordCount >= currentAufgabe.minWords ? "text-emerald-400" : "text-rose-400"
                     }`}
                   >
-                    {wordCount >= currentAufgabe.minWords ? "✓ Sesuai Target" : "✗ Terlalu Pendek"}
+                    {wordCount >= currentAufgabe.minWords ? "✓ Sesuai Target" : "✗ Kurang Panjang"}
                   </div>
                 </div>
 
                 <div className="p-3 rounded-xl bg-zinc-800/80 border border-zinc-700">
-                  <div className="text-zinc-400">Variasi Konnektor</div>
+                  <div className="text-zinc-400">Variasi Konnektoren</div>
                   <div className="font-bold text-emerald-400 mt-1">
                     {detectedConnectors.length} Terdeteksi
                   </div>
                 </div>
 
                 <div className="p-3 rounded-xl bg-zinc-800/80 border border-zinc-700">
-                  <div className="text-zinc-400">Sapaan & Penutup</div>
-                  <div className={`font-bold mt-1 ${hasGreeting && hasClosing ? "text-emerald-400" : "text-amber-400"}`}>
+                  <div className="text-zinc-400">Format Sapaan/Penutup</div>
+                  <div
+                    className={`font-bold mt-1 ${
+                      hasGreeting && hasClosing ? "text-emerald-400" : "text-amber-400"
+                    }`}
+                  >
                     {hasGreeting && hasClosing ? "✓ Lengkap" : "Periksa Format"}
                   </div>
                 </div>
@@ -461,10 +602,10 @@ export const SchreibenView: React.FC<SchreibenViewProps> = ({ stats }) => {
                 </div>
               </div>
 
-              {/* Side-by-Side: Your Text vs Musterlösung */}
+              {/* Side-by-Side Musterlösung */}
               <div className="space-y-2 pt-2">
                 <span className="text-xs font-bold text-amber-400">
-                  Musterlösung (Contoh Jawaban Sempurna Skor 100):
+                  Musterlösung (Contoh Jawaban Ideal Skor 100):
                 </span>
                 <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 font-serif text-xs text-zinc-200 whitespace-pre-line leading-relaxed max-h-60 overflow-y-auto">
                   {currentAufgabe.musterloesung}

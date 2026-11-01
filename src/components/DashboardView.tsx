@@ -1,8 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { UserStats, ExamResultRecord, PacketId } from "@/types";
 import { TabKey } from "./Sidebar";
+import {
+  getActiveExamSession,
+  ACTIVE_LESEN_KEY,
+  ACTIVE_HOREN_KEY,
+  ACTIVE_SCHREIBEN_KEY,
+} from "@/lib/storage";
 import {
   Trophy,
   Target,
@@ -17,6 +23,9 @@ import {
   AlertCircle,
   Gamepad2,
   Sparkles,
+  Award,
+  Bookmark,
+  AlertTriangle,
 } from "lucide-react";
 
 interface DashboardViewProps {
@@ -32,7 +41,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate,
   onPacketChange,
 }) => {
-  // Compute average scores per module
+  const [activeSessionInfo, setActiveSessionInfo] = useState<string | null>(null);
+
+  useEffect(() => {
+    const lesenSess = getActiveExamSession(ACTIVE_LESEN_KEY);
+    if (lesenSess && !lesenSess.isSubmitted) {
+      setActiveSessionInfo("Lesen");
+      return;
+    }
+    const horenSess = getActiveExamSession(ACTIVE_HOREN_KEY);
+    if (horenSess && !horenSess.isSubmitted) {
+      setActiveSessionInfo("Hören");
+      return;
+    }
+    const schreibenSess = getActiveExamSession(ACTIVE_SCHREIBEN_KEY);
+    if (schreibenSess && !schreibenSess.isSubmitted) {
+      setActiveSessionInfo("Schreiben");
+      return;
+    }
+    setActiveSessionInfo(null);
+  }, []);
+
   const getModuleAvg = (module: "lesen" | "hoeren" | "schreiben" | "sprechen") => {
     const records = history.filter((h) => h.module === module);
     if (records.length === 0) return null;
@@ -95,19 +124,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Hero Welcome & Readiness Header */}
+      {/* Active Session Recovery Banner */}
+      {activeSessionInfo && (
+        <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-between gap-4 animate-fade-in">
+          <div className="flex items-center gap-2.5 text-xs text-amber-800 dark:text-amber-200 font-semibold">
+            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+            <span>
+              Anda memiliki sesi ujian <strong>{activeSessionInfo}</strong> yang belum diselesaikan. Progres tersimpan secara aman di peramban Anda.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate(activeSessionInfo.toLowerCase() as TabKey)}
+            className="px-4 py-1.5 rounded-xl bg-amber-500 text-white font-bold text-xs shrink-0 shadow-xs hover:bg-amber-600 transition-colors"
+          >
+            Lanjutkan Sesi
+          </button>
+        </div>
+      )}
+
+      {/* Hero Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-950 p-6 sm:p-8 text-white shadow-xl border border-zinc-800">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold tracking-wide">
               <Sparkles className="w-3.5 h-3.5" />
-              ZERTIVA B1 PERSONAL STUDIO
+              GOETHEMEISTER B1 STUDIO (GMB1)
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Kesiapan Goethe-Zertifikat B1
+              Studio Persiapan Goethe-Zertifikat B1
             </h1>
             <p className="text-sm text-zinc-300 leading-relaxed">
-              Pantau progres belajar 4 modul ujian resmi dan asah refleks kosakata serta tata bahasa melalui Game Arena B1 dengan sistem Spaced Repetition.
+              Selamat datang{stats.candidateName ? `, ${stats.candidateName}` : ""}! Latih 4 modul ujian resmi Goethe B1 (Lesen, Hören, Schreiben, Sprechen), simpan kosakata penting ke kamus pribadi, dan pantau kelulusan Anda.
             </p>
           </div>
 
@@ -127,15 +175,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <BookOpen className="w-4 h-4" />
               <span>Mulai Ujian Lesen</span>
             </button>
+            <button
+              onClick={() => onNavigate("report-card")}
+              className="px-4 py-3 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700 text-amber-400 font-semibold text-sm border border-zinc-700 active:scale-98 transition-all flex items-center justify-center gap-1.5"
+              title="Lihat Kartu Hasil Ujian B1"
+            >
+              <Award className="w-4 h-4" />
+              <span className="hidden xl:inline">Zertifikat</span>
+            </button>
           </div>
         </div>
 
-        {/* Ambient background glow */}
+        {/* Glow ambient */}
         <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
       </div>
 
-      {/* Key Metric Cards */}
+      {/* Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Streak */}
         <div className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs flex items-center gap-4">
@@ -147,7 +203,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               {stats.streak} Hari
             </div>
             <div className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
-              Daily Practice Streak
+              Streak Latihan Harian
             </div>
           </div>
         </div>
@@ -214,6 +270,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               Syarat kelulusan resmi: Nilai minimal 60% per modul (Bestanden ≥ 60 Poin)
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => onNavigate("report-card")}
+            className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 hover:underline"
+          >
+            <span>Buka Lembar Sertifikat</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

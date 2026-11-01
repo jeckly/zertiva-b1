@@ -84,19 +84,18 @@ export const JsonManagerView: React.FC<JsonManagerViewProps> = ({
       setCustomQuestionsCount(getCustomGameQuestions().length);
       setMessage({
         type: "success",
-        text: `Berhasil menambahkan ${count} butir soal baru ke Bank Soal Kustom LocalStorage!`,
+        text: `Berhasil menambahkan ${count} butir soal baru ke Bank Soal Kustom GoetheMeister B1!`,
       });
       setJsonInput("");
       onRefresh();
     } catch {
       setMessage({
         type: "error",
-        text: "Gagal memproses JSON: Pastikan sintaks kurung kurawal, tanda petik dua, dan koma sudah benar.",
+        text: "Gagal memproses JSON: Pastikan format sintaks sudah benar.",
       });
     }
   };
 
-  // Quick 1-click import bonus pack from public/bank-soal-cadangan-b1.json
   const handleImportBonusPack = async () => {
     setMessage(null);
     try {
@@ -118,19 +117,17 @@ export const JsonManagerView: React.FC<JsonManagerViewProps> = ({
     }
   };
 
-  // Export full backup
   const handleExportBackup = () => {
     const dataStr = exportAllData();
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `zertiva-b1-backup-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `gmb1-studio-backup-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  // Import full backup file
   const handleFileBackupUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -143,7 +140,7 @@ export const JsonManagerView: React.FC<JsonManagerViewProps> = ({
         if (ok) {
           setMessage({
             type: "success",
-            text: "Seluruh progres belajar, streak, skor, dan bank soal kustom berhasil dipulihkan!",
+            text: "Seluruh progres belajar, streak, kamus kosakata, dan bank soal kustom GoetheMeister berhasil dipulihkan!",
           });
           setCustomQuestionsCount(getCustomGameQuestions().length);
           onRefresh();
@@ -168,7 +165,7 @@ export const JsonManagerView: React.FC<JsonManagerViewProps> = ({
               <FileJson className="w-5 h-5" />
             </span>
             <h2 className="text-xl font-black text-zinc-900 dark:text-white">
-              JSON Manager & Backup Data
+              JSON Manager & Backup Data (GMB1)
             </h2>
           </div>
           <p className="text-xs text-zinc-600 dark:text-zinc-400">
@@ -219,11 +216,11 @@ export const JsonManagerView: React.FC<JsonManagerViewProps> = ({
           </button>
         </div>
         <p className="text-xs text-indigo-200 leading-relaxed">
-          Kami telah menyertakan 1 paket file JSON bank soal tambahan (Wortschatz, Konnektoren, Passiv & Konjunktiv II) yang langsung siap dimasukkan ke dalam LocalStorage hanya dengan sekali klik!
+          Telah tersedia 1 paket file JSON bank soal tambahan (Wortschatz, Konnektoren, Passiv & Konjunktiv II) yang langsung siap dimasukkan ke dalam LocalStorage hanya dengan sekali klik!
         </p>
       </div>
 
-      {/* Custom Question Injector (Paste JSON) */}
+      {/* Custom Question Injector */}
       <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
@@ -274,7 +271,7 @@ export const JsonManagerView: React.FC<JsonManagerViewProps> = ({
             <span>Export Progres Belajar</span>
           </div>
           <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            Unduh seluruh streak harian, skor simulasi Goethe, data Fehlerbuch, dan soal kustom ke dalam file <code>.json</code>.
+            Unduh seluruh streak harian, skor simulasi Goethe, data Fehlerbuch, kamus Meine Vokabeln, dan soal kustom ke dalam file <code>.json</code>.
           </p>
           <button
             type="button"

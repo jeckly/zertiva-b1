@@ -3,18 +3,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { UserStats } from "@/types";
 import { initialSprechenPackets } from "@/data/sprechenData";
+import { speechPlayer } from "@/lib/audioSpeech";
 import {
   Mic,
   Square,
   Play,
-  RotateCcw,
   Volume2,
   Clock,
-  Sparkles,
   BookOpen,
-  HelpCircle,
-  CheckCircle2,
   ChevronRight,
+  Download,
+  RotateCcw,
 } from "lucide-react";
 
 interface SprechenViewProps {
@@ -35,11 +34,12 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
   // MediaRecorder Voice Recording
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [recordError, setRecordError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  // TTS State for Virtual Partner
+  // Partner TTS state
   const [isPartnerSpeaking, setIsPartnerSpeaking] = useState<boolean>(false);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
     }
   }, [stats.activePacket]);
 
-  // Preparation Timer Interval
+  // Preparation Timer
   useEffect(() => {
     if (!prepTimerRunning) return;
     const interval = setInterval(() => {
@@ -57,7 +57,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
     return () => clearInterval(interval);
   }, [prepTimerRunning]);
 
-  // Speaking Timer Interval
+  // Speaking Timer
   useEffect(() => {
     if (!speakTimerRunning) return;
     const interval = setInterval(() => {
@@ -66,7 +66,15 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
     return () => clearInterval(interval);
   }, [speakTimerRunning]);
 
-  const packet = initialSprechenPackets.find((p) => p.packetId === activePacketId) || initialSprechenPackets[0];
+  // Clean speech when unmounting
+  useEffect(() => {
+    return () => {
+      speechPlayer.stop();
+    };
+  }, []);
+
+  const packet =
+    initialSprechenPackets.find((p) => p.packetId === activePacketId) || initialSprechenPackets[0];
   const currentTopic = packet.teil2Topics[selectedTopicIndex] || packet.teil2Topics[0];
 
   const formatTimer = (seconds: number) => {
@@ -75,28 +83,28 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Play Virtual Partner / Examiner TTS
+  // Play Partner / Examiner Voice using speechPlayer
   const playPartnerVoice = (text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (isPartnerSpeaking) {
+      speechPlayer.stop();
+      setIsPartnerSpeaking(false);
+      return;
+    }
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "de-DE";
-    utterance.rate = 0.95;
-
-    utterance.onstart = () => setIsPartnerSpeaking(true);
-    utterance.onend = () => setIsPartnerSpeaking(false);
-    utterance.onerror = () => setIsPartnerSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
+    speechPlayer.speak(text, {
+      rate: 0.95,
+      onStart: () => setIsPartnerSpeaking(true),
+      onEnd: () => setIsPartnerSpeaking(false),
+      onError: () => setIsPartnerSpeaking(false),
+    });
   };
 
-  // Voice Recording Handlers (MediaRecorder)
+  // Voice Recording with MediaRecorder
   const startRecording = async () => {
     setRecordError(null);
     try {
       if (typeof navigator === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setRecordError("Browser Anda tidak mendukung perekaman mikrofon.");
+        setRecordError("Peramban Anda tidak mendukung perekaman audio.");
         return;
       }
 
@@ -112,8 +120,9 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        const url = URL.createObjectURL(audioBlob);
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        setAudioBlob(blob);
+        const url = URL.createObjectURL(blob);
         setAudioUrl(url);
         stream.getTracks().forEach((track) => track.stop());
       };
@@ -123,7 +132,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
       setSpeakTimerRunning(true);
       setSpeakTime(0);
     } catch {
-      setRecordError("Gagal mengakses mikrofon. Pastikan izin mikrofon diberikan di browser.");
+      setRecordError("Gagal mengakses mikrofon. Harap berikan izin akses mikrofon di peramban Anda.");
     }
   };
 
@@ -133,6 +142,16 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
       setIsRecording(false);
       setSpeakTimerRunning(false);
     }
+  };
+
+  const downloadRecording = () => {
+    if (!audioBlob) return;
+    const url = URL.createObjectURL(audioBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `GMB1-Sprechen-Teil${activeTeil}-${Date.now()}.webm`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -167,7 +186,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
           </div>
         </div>
 
-        {/* Dual Timers (Vorbereitung & Sprechzeit) */}
+        {/* Dual Timers */}
         <div className="flex items-center gap-3">
           {/* Prep timer */}
           <div className="flex items-center gap-2 p-1.5 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs">
@@ -242,58 +261,92 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
         </button>
       </div>
 
-      {/* MediaRecorder Audio Recording Control Bar */}
-      <div className="p-4 rounded-2xl bg-zinc-900 text-white border border-zinc-800 shadow-md flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              isRecording ? "bg-rose-500 animate-pulse" : "bg-zinc-800 text-zinc-300"
-            }`}
-          >
-            <Mic className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <div className="font-bold text-xs sm:text-sm">
-              {isRecording ? "Sedang Merekam Suara Latihan..." : "Rekam Suara Mandiri (Browser Recorder)"}
+      {/* Audio Recorder with Waveform & Download Controls */}
+      <div className="p-6 rounded-3xl bg-zinc-900 text-white border border-zinc-800 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                isRecording ? "bg-rose-500 animate-pulse" : "bg-zinc-800 text-zinc-300"
+              }`}
+            >
+              <Mic className="w-6 h-6 text-white" />
             </div>
-            <p className="text-[11px] text-zinc-400">
-              Dengarkan rekaman bicara Anda untuk mengevaluasi kelancaran dan pengucapan (Aussprache).
-            </p>
+            <div>
+              <div className="font-bold text-sm sm:text-base">
+                {isRecording ? "Sedang Merekam Suara Latihan..." : "Perekam Suara Latihan (Voice Studio)"}
+              </div>
+              <p className="text-xs text-zinc-400">
+                Latih kelancaran berbicara, dengarkan kembali pelafalan Anda, atau unduh hasil rekaman.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {!isRecording ? (
+              <button
+                type="button"
+                onClick={startRecording}
+                className="px-5 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-rose-500/25 active:scale-95 transition-all"
+              >
+                <Mic className="w-4 h-4" />
+                <span>Mulai Rekam Suara</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={stopRecording}
+                className="px-5 py-2.5 rounded-2xl bg-white text-zinc-900 font-bold text-xs flex items-center gap-2 shadow-lg active:scale-95 transition-all"
+              >
+                <Square className="w-4 h-4 fill-zinc-900" />
+                <span>Hentikan & Simpan</span>
+              </button>
+            )}
+
+            {audioUrl && (
+              <>
+                <button
+                  type="button"
+                  onClick={downloadRecording}
+                  className="px-4 py-2.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold flex items-center gap-2 transition-colors border border-zinc-700"
+                  title="Unduh rekaman suara ke perangkat"
+                >
+                  <Download className="w-4 h-4 text-amber-400" />
+                  <span>Unduh Rekaman (.webm)</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {!isRecording ? (
-            <button
-              type="button"
-              onClick={startRecording}
-              className="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-rose-500/20 active:scale-95 transition-all"
-            >
-              <Mic className="w-4 h-4" />
-              <span>Mulai Rekam Suara</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={stopRecording}
-              className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-white text-zinc-900 font-bold text-xs flex items-center gap-2 shadow-lg active:scale-95 transition-all"
-            >
-              <Square className="w-4 h-4 fill-zinc-900" />
-              <span>Selesai & Putar Hasil</span>
-            </button>
-          )}
+        {/* Audio Waveform animation while recording */}
+        {isRecording && (
+          <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center gap-1.5 animate-fade-in">
+            <span className="text-xs font-mono text-rose-400 mr-3">REC: {formatTimer(speakTime)}</span>
+            {[30, 60, 90, 45, 80, 100, 70, 50, 95, 40, 85, 60, 30, 90, 65, 40].map((h, i) => (
+              <div
+                key={i}
+                className="w-1.5 bg-rose-500 rounded-full animate-pulse"
+                style={{
+                  height: `${h * 0.4}px`,
+                  animationDelay: `${i * 90}ms`,
+                  animationDuration: "600ms",
+                }}
+              />
+            ))}
+          </div>
+        )}
 
-          {audioUrl && (
-            <div className="flex items-center gap-2">
-              <audio src={audioUrl} controls className="h-8 max-w-[200px] sm:max-w-none" />
-            </div>
-          )}
-        </div>
+        {/* Audio Player for recorded voice */}
+        {audioUrl && !isRecording && (
+          <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+            <span className="text-xs font-bold text-amber-400">Hasil Rekaman Suara Anda:</span>
+            <audio src={audioUrl} controls className="w-full sm:w-auto h-9" />
+          </div>
+        )}
 
         {recordError && (
-          <div className="w-full text-xs text-rose-400 font-semibold pt-1">
-            ⚠️ {recordError}
-          </div>
+          <div className="text-xs text-rose-400 font-semibold">⚠️ {recordError}</div>
         )}
       </div>
 
@@ -302,7 +355,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
       {/* ======================================================== */}
       {activeTeil === 1 && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Skenario & Poin Diskusi (6 cols) */}
+          {/* Skenario (6 cols) */}
           <div className="lg:col-span-6 p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
             <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
               Aufgabenkarte
@@ -348,11 +401,11 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
             </div>
           </div>
 
-          {/* Simulasi Partner Virtual (Web Speech API) (6 cols) */}
+          {/* Virtual Partner Dialogue TTS (6 cols) */}
           <div className="lg:col-span-6 p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                Simulasi Suara Partner Virtual
+                Simulasi Suara Partner Virtual (de-DE)
               </span>
               {isPartnerSpeaking && (
                 <span className="text-xs text-amber-500 font-bold animate-pulse flex items-center gap-1">
@@ -362,7 +415,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
             </div>
 
             <p className="text-xs text-zinc-600 dark:text-zinc-400">
-              Tekan tombol <strong>Putar Suara Partner</strong>, dengarkan pertanyaannya dalam bahasa Jerman, lalu berbicaralah secara langsung seolah-olah berdialog dengan partner asli.
+              Tekan tombol <strong>Putar Suara Partner</strong>, dengarkan dalam bahasa Jerman asli, lalu berbicaralah secara langsung merespons partner tersebut.
             </p>
 
             <div className="space-y-3">
@@ -411,7 +464,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
       {/* ======================================================== */}
       {activeTeil === 2 && (
         <div className="space-y-6">
-          {/* Topic selector (Thema 1 vs Thema 2) */}
+          {/* Topic selector */}
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Pilihan Topik:</span>
             {packet.teil2Topics.map((top, idx) => (
@@ -458,7 +511,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
             <div className="lg:col-span-7 p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                  Muster-Vortrag (Contoh Skrip Presentasi Skor 100)
+                  Muster-Vortrag (Skrip Presentasi Skor 100)
                 </span>
                 <button
                   type="button"
@@ -475,7 +528,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
               </div>
             </div>
 
-            {/* Redemittel Sprechen (5 cols) */}
+            {/* Redemittel (5 cols) */}
             <div className="lg:col-span-5 p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
               <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4 text-amber-500" />
@@ -544,10 +597,10 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
             </div>
           </div>
 
-          {/* Examiner Questions (with TTS voice playback) */}
+          {/* Examiner Questions */}
           <div className="space-y-3 pt-2">
             <span className="text-xs font-bold text-zinc-900 dark:text-white">
-              Pertanyaan dari Penguji & Partner (Dengarkan & Latih Respon Lisan):
+              Pertanyaan Penguji & Partner:
             </span>
             <div className="space-y-3">
               {packet.teil3.examinerQuestions.map((eq, idx) => (
@@ -570,7 +623,7 @@ export const SprechenView: React.FC<SprechenViewProps> = ({ stats }) => {
                   </div>
 
                   <div className="p-3 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-serif text-zinc-700 dark:text-zinc-300">
-                    <strong className="text-amber-600 dark:text-amber-400">Contoh Jawaban B1:</strong>{" "}
+                    <strong className="text-amber-600 dark:text-amber-400">Contoh Respon B1:</strong>{" "}
                     {eq.sampleAnswer}
                   </div>
                 </div>

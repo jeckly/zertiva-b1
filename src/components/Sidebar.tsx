@@ -12,6 +12,8 @@ import {
   FileJson,
   X,
   Sparkles,
+  Bookmark,
+  Award,
 } from "lucide-react";
 
 export type TabKey =
@@ -21,7 +23,9 @@ export type TabKey =
   | "hoeren"
   | "schreiben"
   | "sprechen"
+  | "meine-vokabeln"
   | "fehlerbuch"
+  | "report-card"
   | "json-manager";
 
 interface SidebarProps {
@@ -30,6 +34,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   fehlerCount: number;
+  vocabCount?: number;
 }
 
 interface NavItem {
@@ -46,6 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
   fehlerCount,
+  vocabCount = 0,
 }) => {
   const navItems: NavItem[] = [
     {
@@ -80,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: "Simulasi Schreiben",
       icon: PenTool,
       badge: "Aufgabe 1-3",
-      description: "Editor teks + Evaluasi Rubrik B1",
+      description: "Editor teks + Evaluasi cerdas",
     },
     {
       key: "sprechen",
@@ -90,6 +96,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       description: "Partner virtual & perekam suara",
     },
     {
+      key: "meine-vokabeln",
+      label: "Meine Vokabeln",
+      icon: Bookmark,
+      badge: vocabCount > 0 ? `${vocabCount}` : undefined,
+      description: "Kamus kata simpanan & flashcard",
+    },
+    {
       key: "fehlerbuch",
       label: "Fehlerbuch",
       icon: AlertOctagon,
@@ -97,11 +110,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       description: "Bank kesalahan & spaced repetition",
     },
     {
+      key: "report-card",
+      label: "Zertifikat & Report",
+      icon: Award,
+      badge: "PDF Print",
+      description: "Kartu hasil ujian & sertifikat B1",
+    },
+    {
       key: "json-manager",
       label: "JSON Manager",
       icon: FileJson,
       badge: "Import/Export",
-      description: "Tambah soal & backup progres",
+      description: "Tambah soal & backup data",
     },
   ];
 
@@ -130,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-4 space-y-1 overflow-y-auto">
           <div className="flex items-center justify-between pb-3 px-2 md:hidden">
             <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
-              Menu Navigasi
+              Menu GoetheMeister
             </span>
             <button
               onClick={onClose}
@@ -177,6 +197,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-2 shrink-0 ${
                       item.key === "fehlerbuch" && fehlerCount > 0
                         ? "bg-rose-100 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800"
+                        : item.key === "meine-vokabeln" && vocabCount > 0
+                        ? "bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800"
                         : isActive
                         ? "bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200"
                         : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"

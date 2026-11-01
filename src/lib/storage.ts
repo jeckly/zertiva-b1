@@ -1,10 +1,33 @@
-import { UserStats, FehlerItem, ExamResultRecord, GameQuestion, PacketId } from "@/types";
+import {
+  UserStats,
+  FehlerItem,
+  ExamResultRecord,
+  GameQuestion,
+  PacketId,
+  VocabItem,
+  ActiveExamSession,
+} from "@/types";
 import { initialGameQuestions } from "@/data/gameQuestions";
 
-const STATS_KEY = "zertiva_user_stats_v1";
-const FEHLER_KEY = "zertiva_fehlerbuch_v1";
-const HISTORY_KEY = "zertiva_exam_history_v1";
-const CUSTOM_GAME_KEY = "zertiva_custom_game_questions_v1";
+// Rebranded Storage Keys with backward compatibility fallback
+const STATS_KEY = "gmb1_user_stats_v2";
+const STATS_KEY_LEGACY = "zertiva_user_stats_v1";
+
+const FEHLER_KEY = "gmb1_fehlerbuch_v2";
+const FEHLER_KEY_LEGACY = "zertiva_fehlerbuch_v1";
+
+const HISTORY_KEY = "gmb1_exam_history_v2";
+const HISTORY_KEY_LEGACY = "zertiva_exam_history_v1";
+
+const CUSTOM_GAME_KEY = "gmb1_custom_game_questions_v2";
+const CUSTOM_GAME_KEY_LEGACY = "zertiva_custom_game_questions_v1";
+
+const VOCAB_KEY = "gmb1_meine_vokabeln_v2";
+
+// Active Session Keys for Realtime Auto-Save
+const ACTIVE_LESEN_KEY = "gmb1_active_lesen_session";
+const ACTIVE_HOREN_KEY = "gmb1_active_hoeren_session";
+const ACTIVE_SCHREIBEN_KEY = "gmb1_active_schreiben_session";
 
 const defaultStats: UserStats = {
   xp: 150,
@@ -14,25 +37,28 @@ const defaultStats: UserStats = {
   totalGameCorrect: 13,
   activePacket: "A",
   zenMode: false,
+  candidateName: "Goethe-Kandidat",
 };
 
 export const getStoredStats = (): UserStats => {
   if (typeof window === "undefined") return defaultStats;
   try {
-    const raw = localStorage.getItem(STATS_KEY);
+    let raw = localStorage.getItem(STATS_KEY);
+    if (!raw) {
+      // Check legacy key
+      raw = localStorage.getItem(STATS_KEY_LEGACY);
+    }
     if (!raw) {
       localStorage.setItem(STATS_KEY, JSON.stringify(defaultStats));
       return defaultStats;
     }
     const parsed = JSON.parse(raw);
-    // Check daily streak
     const today = new Date().toISOString().split("T")[0];
     if (parsed.lastActiveDate !== today) {
       const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
       if (parsed.lastActiveDate === yesterday) {
         parsed.streak = (parsed.streak || 0) + 1;
       } else {
-        // Streak resets if missed more than 1 day
         const daysDiff = (new Date(today).getTime() - new Date(parsed.lastActiveDate).getTime()) / 86400000;
         if (daysDiff > 1.5) {
           parsed.streak = 1;
@@ -78,17 +104,19 @@ export const recordGameAnswer = (isCorrect: boolean): UserStats => {
 export const getFehlerbuch = (): FehlerItem[] => {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(FEHLER_KEY);
+    let raw = localStorage.getItem(FEHLER_KEY);
+    if (!raw) raw = localStorage.getItem(FEHLER_KEY_LEGACY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 };
 
-export const addFehlerItem = (item: Omit<FehlerItem, "id" | "dateAdded" | "consecutiveCorrect" | "mastered">): FehlerItem[] => {
+export const addFehlerItem = (
+  item: Omit<FehlerItem, "id" | "dateAdded" | "consecutiveCorrect" | "mastered">
+): FehlerItem[] => {
   if (typeof window === "undefined") return [];
   const current = getFehlerbuch();
-  // Check if identical question already exists in active errors
   const existingIndex = current.findIndex((f) => f.questionText === item.questionText);
   if (existingIndex >= 0) {
     current[existingIndex].consecutiveCorrect = 0;
@@ -141,7 +169,8 @@ export const clearMasteredFehler = (): FehlerItem[] => {
 export const getExamHistory = (): ExamResultRecord[] => {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(HISTORY_KEY);
+    let raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) raw = localStorage.getItem(HISTORY_KEY_LEGACY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -158,10 +187,88 @@ export const saveExamResult = (record: Omit<ExamResultRecord, "id" | "date">): E
   };
   history.unshift(newRecord);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-  // Reward XP based on exam score
   const xpReward = Math.round(record.score * 1.5) + (record.passed ? 100 : 25);
   addXP(xpReward);
   return history;
+};
+
+// ==========================================
+// AUTO-SAVE EXAM SESSIONS (REALTIME RESILIENCE)
+// ==========================================
+export const saveActiveExamSession = <T>(key: string, session: ActiveExamSession<T>): void => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, JSON.stringify(session));
+  } catch {}
+};
+
+export const getActiveExamSession = <T>(key: string): ActiveExamSession<T> | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+export const clearActiveExamSession = (key: string): void => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(key);
+  } catch {}
+};
+
+export { ACTIVE_LESEN_KEY, ACTIVE_HOREN_KEY, ACTIVE_SCHREIBEN_KEY };
+
+// ==========================================
+// MEINE VOKABELN (SAVED VOCABULARY)
+// ==========================================
+export const getSavedVocab = (): VocabItem[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(VOCAB_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const saveVocabWord = (item: Omit<VocabItem, "id" | "dateAdded" | "learned">): VocabItem[] => {
+  if (typeof window === "undefined") return [];
+  const list = getSavedVocab();
+  const existingIdx = list.findIndex((v) => v.german.toLowerCase() === item.german.toLowerCase());
+  if (existingIdx >= 0) {
+    list[existingIdx].indonesian = item.indonesian;
+    list[existingIdx].article = item.article || list[existingIdx].article;
+  } else {
+    list.unshift({
+      ...item,
+      id: `voc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      dateAdded: new Date().toISOString(),
+      learned: false,
+    });
+  }
+  localStorage.setItem(VOCAB_KEY, JSON.stringify(list));
+  return list;
+};
+
+export const deleteVocabWord = (id: string): VocabItem[] => {
+  if (typeof window === "undefined") return [];
+  const list = getSavedVocab().filter((v) => v.id !== id);
+  localStorage.setItem(VOCAB_KEY, JSON.stringify(list));
+  return list;
+};
+
+export const toggleVocabLearned = (id: string): VocabItem[] => {
+  if (typeof window === "undefined") return [];
+  const list = getSavedVocab();
+  const target = list.find((v) => v.id === id);
+  if (target) {
+    target.learned = !target.learned;
+    localStorage.setItem(VOCAB_KEY, JSON.stringify(list));
+  }
+  return list;
 };
 
 // ==========================================
@@ -170,7 +277,8 @@ export const saveExamResult = (record: Omit<ExamResultRecord, "id" | "date">): E
 export const getCustomGameQuestions = (): GameQuestion[] => {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(CUSTOM_GAME_KEY);
+    let raw = localStorage.getItem(CUSTOM_GAME_KEY);
+    if (!raw) raw = localStorage.getItem(CUSTOM_GAME_KEY_LEGACY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -211,12 +319,13 @@ export const exportAllData = (): string => {
   if (typeof window === "undefined") return "{}";
   const bundle = {
     exportDate: new Date().toISOString(),
-    app: "Zertiva B1 Personal Studio",
-    version: "1.0",
+    app: "GoetheMeister B1 Studio",
+    version: "2.0",
     stats: getStoredStats(),
     fehlerbuch: getFehlerbuch(),
     examHistory: getExamHistory(),
     customGameQuestions: getCustomGameQuestions(),
+    savedVocab: getSavedVocab(),
   };
   return JSON.stringify(bundle, null, 2);
 };
@@ -228,7 +337,9 @@ export const importAllData = (jsonStr: string): boolean => {
     if (parsed.stats) localStorage.setItem(STATS_KEY, JSON.stringify(parsed.stats));
     if (parsed.fehlerbuch) localStorage.setItem(FEHLER_KEY, JSON.stringify(parsed.fehlerbuch));
     if (parsed.examHistory) localStorage.setItem(HISTORY_KEY, JSON.stringify(parsed.examHistory));
-    if (parsed.customGameQuestions) localStorage.setItem(CUSTOM_GAME_KEY, JSON.stringify(parsed.customGameQuestions));
+    if (parsed.customGameQuestions)
+      localStorage.setItem(CUSTOM_GAME_KEY, JSON.stringify(parsed.customGameQuestions));
+    if (parsed.savedVocab) localStorage.setItem(VOCAB_KEY, JSON.stringify(parsed.savedVocab));
     return true;
   } catch {
     return false;

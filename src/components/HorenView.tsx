@@ -1,23 +1,31 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { UserStats } from "@/types";
 import { initialHorenPackets } from "@/data/horenData";
-import { saveExamResult, addFehlerItem } from "@/lib/storage";
+import {
+  saveExamResult,
+  addFehlerItem,
+  saveActiveExamSession,
+  getActiveExamSession,
+  clearActiveExamSession,
+  ACTIVE_HOREN_KEY,
+} from "@/lib/storage";
+import { speechPlayer } from "@/lib/audioSpeech";
+import { InteractiveText } from "./InteractiveText";
 import {
   Play,
-  Pause,
+  Square,
   RotateCcw,
   Volume2,
-  VolumeX,
   FileText,
   CheckCircle2,
   AlertCircle,
   HelpCircle,
-  Sparkles,
-  ArrowRight,
-  ArrowLeft,
   Gauge,
+  ShieldCheck,
+  Timer,
+  AlertTriangle,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -27,18 +35,18 @@ interface HorenViewProps {
 
 export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
   const [activePacketId, setActivePacketId] = useState<"A" | "B" | "C">("A");
+  const [examMode, setExamMode] = useState<"exam" | "study">("exam");
   const [currentTeilIndex, setCurrentTeilIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [showTranscript, setShowTranscript] = useState<boolean>(false);
-  const [practiceMode, setPracticeMode] = useState<boolean>(false);
+  const [sessionRestored, setSessionRestored] = useState<boolean>(false);
 
   // Audio Player State
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playSpeed, setPlaySpeed] = useState<number>(1.0);
   const [playCount, setPlayCount] = useState<Record<string, number>>({});
-  const [speechSupported, setSpeechSupported] = useState<boolean>(true);
-  const [germanVoice, setGermanVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [currentSentenceInfo, setCurrentSentenceInfo] = useState<{ current: number; total: number } | null>(null);
 
   // Result state
   const [scoreResult, setScoreResult] = useState<{
@@ -48,100 +56,100 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
     passed: boolean;
   } | null>(null);
 
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-
+  // Restore active session on mount
   useEffect(() => {
-    if (stats.activePacket === "A" || stats.activePacket === "B" || stats.activePacket === "C") {
+    const saved = getActiveExamSession<{ playCount?: Record<string, number> }>(ACTIVE_HOREN_KEY);
+    if (saved && !saved.isSubmitted) {
+      setActivePacketId(saved.packetId);
+      setExamMode(saved.mode);
+      setAnswers(saved.answers || {});
+      setCurrentTeilIndex(saved.currentTeilIndex || 0);
+      setIsSubmitted(saved.isSubmitted || false);
+      setScoreResult(saved.scoreResult || null);
+      if (saved.extraData?.playCount) setPlayCount(saved.extraData.playCount);
+      setSessionRestored(true);
+    } else if (
+      stats.activePacket === "A" ||
+      stats.activePacket === "B" ||
+      stats.activePacket === "C"
+    ) {
       setActivePacketId(stats.activePacket);
     }
   }, [stats.activePacket]);
 
-  // Load German TTS voices
-  useEffect(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      setSpeechSupported(false);
-      return;
-    }
-
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      const deVoice =
-        voices.find((v) => v.lang.startsWith("de") && v.name.toLowerCase().includes("german")) ||
-        voices.find((v) => v.lang.startsWith("de")) ||
-        null;
-      setGermanVoice(deVoice);
-    };
-
-    loadVoices();
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-
-    return () => {
-      if (typeof window !== "undefined" && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
-  const packet = initialHorenPackets.find((p) => p.packetId === activePacketId) || initialHorenPackets[0];
+  const packet =
+    initialHorenPackets.find((p) => p.packetId === activePacketId) || initialHorenPackets[0];
   const teile = packet.teile;
   const currentTeil = teile[currentTeilIndex] || teile[0];
   const allQuestions = teile.flatMap((t) => t.questions);
 
   const currentTeilKey = `${activePacketId}_teil_${currentTeil.teil}`;
   const currentPlays = playCount[currentTeilKey] || 0;
-  const canPlay = practiceMode || currentPlays < currentTeil.playLimit;
+  const canPlay = examMode === "study" || currentPlays < currentTeil.playLimit;
 
-  // Handle Play TTS
+  // Auto-Save active session in realtime
+  useEffect(() => {
+    if (isSubmitted) return;
+    saveActiveExamSession(ACTIVE_HOREN_KEY, {
+      packetId: activePacketId,
+      mode: examMode,
+      answers,
+      timeLeft: 0,
+      currentTeilIndex,
+      isSubmitted,
+      scoreResult,
+      extraData: { playCount },
+      lastUpdated: new Date().toISOString(),
+    });
+  }, [activePacketId, examMode, answers, currentTeilIndex, isSubmitted, scoreResult, playCount]);
+
+  // Clean speech when unmounting
+  useEffect(() => {
+    return () => {
+      speechPlayer.stop();
+    };
+  }, []);
+
+  // Handle Play Audio using Bulletproof speechPlayer
   const handlePlayAudio = () => {
-    if (!speechSupported || typeof window === "undefined") return;
-
     if (isPlaying) {
-      window.speechSynthesis.cancel();
+      speechPlayer.stop();
       setIsPlaying(false);
+      setCurrentSentenceInfo(null);
       return;
     }
 
     if (!canPlay) return;
 
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(currentTeil.audioTranscript);
-    utterance.lang = "de-DE";
-    utterance.rate = playSpeed;
-    if (germanVoice) {
-      utterance.voice = germanVoice;
-    }
-
-    utterance.onstart = () => {
-      setIsPlaying(true);
-      setPlayCount((prev) => ({
-        ...prev,
-        [currentTeilKey]: (prev[currentTeilKey] || 0) + 1,
-      }));
-    };
-
-    utterance.onend = () => {
-      setIsPlaying(false);
-    };
-
-    utterance.onerror = () => {
-      setIsPlaying(false);
-    };
-
-    utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
+    speechPlayer.speak(currentTeil.audioTranscript, {
+      rate: playSpeed,
+      onStart: () => {
+        setIsPlaying(true);
+        setPlayCount((prev) => ({
+          ...prev,
+          [currentTeilKey]: (prev[currentTeilKey] || 0) + 1,
+        }));
+      },
+      onSentenceChange: (cur, tot) => {
+        setCurrentSentenceInfo({ current: cur, total: tot });
+      },
+      onEnd: () => {
+        setIsPlaying(false);
+        setCurrentSentenceInfo(null);
+      },
+      onError: () => {
+        setIsPlaying(false);
+        setCurrentSentenceInfo(null);
+      },
+    });
   };
 
   const handleStopAudio = () => {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      setIsPlaying(false);
-    }
+    speechPlayer.stop();
+    setIsPlaying(false);
+    setCurrentSentenceInfo(null);
   };
 
-  // Change Teil -> stop speech
   const handleSelectTeil = (index: number) => {
     handleStopAudio();
     setCurrentTeilIndex(index);
@@ -173,14 +181,17 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
     const scaledScore = Math.round((correct / allQuestions.length) * 100);
     const passed = scaledScore >= 60;
 
-    setScoreResult({
+    const res = {
       score: scaledScore,
       correctCount: correct,
       totalCount: allQuestions.length,
       passed,
-    });
+    };
+
+    setScoreResult(res);
     setIsSubmitted(true);
-    setShowTranscript(true); // Automatically reveal transcript on review!
+    setShowTranscript(true);
+    clearActiveExamSession(ACTIVE_HOREN_KEY);
 
     saveExamResult({
       module: "hoeren",
@@ -196,21 +207,47 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
     }
   };
 
-  const resetExam = () => {
+  const handleResetExam = (confirmFresh = true) => {
+    if (
+      confirmFresh &&
+      Object.keys(answers).length > 0 &&
+      !isSubmitted &&
+      !window.confirm("Yakin ingin memulai ulang ujian Hören? Progres sesi ini akan di-reset.")
+    ) {
+      return;
+    }
     handleStopAudio();
+    clearActiveExamSession(ACTIVE_HOREN_KEY);
     setAnswers({});
     setIsSubmitted(false);
     setShowTranscript(false);
     setScoreResult(null);
     setPlayCount({});
     setCurrentTeilIndex(0);
+    setSessionRestored(false);
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Session Restored Alert Banner */}
+      {sessionRestored && !isSubmitted && (
+        <div className="p-3.5 px-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-semibold flex items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Sesi ujian Hören sebelumnya otomatis dipulihkan dari LocalStorage.</span>
+          </div>
+          <button
+            onClick={() => handleResetExam(true)}
+            className="text-[11px] font-bold text-amber-900 dark:text-amber-100 underline hover:no-underline"
+          >
+            Mulai Ujian Baru
+          </button>
+        </div>
+      )}
+
       {/* Top Header & Packet selection */}
       <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
             {(["A", "B", "C"] as const).map((pid) => (
               <button
@@ -218,7 +255,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
                 type="button"
                 onClick={() => {
                   setActivePacketId(pid);
-                  resetExam();
+                  handleResetExam(false);
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activePacketId === pid
@@ -231,30 +268,40 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
             ))}
           </div>
 
-          <div>
-            <h2 className="text-sm font-bold text-zinc-900 dark:text-white">
-              {packet.title}
-            </h2>
-            <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-              Goethe B1 Hören mit nativer Audio-Sprachausgabe (de-DE)
-            </p>
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-xs font-bold">
+            <button
+              type="button"
+              onClick={() => setExamMode("exam")}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                examMode === "exam"
+                  ? "bg-rose-500 text-white shadow-xs"
+                  : "text-zinc-600 dark:text-zinc-400"
+              }`}
+            >
+              <Timer className="w-3.5 h-3.5" />
+              <span>Real Exam</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setExamMode("study")}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                examMode === "study"
+                  ? "bg-emerald-500 text-white shadow-xs"
+                  : "text-zinc-600 dark:text-zinc-400"
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Study Mode</span>
+            </button>
           </div>
         </div>
 
-        {/* Practice mode toggle & Submit */}
+        {/* Action buttons */}
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setPracticeMode(!practiceMode)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors ${
-              practiceMode
-                ? "bg-purple-50 dark:bg-purple-950/40 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300"
-                : "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400"
-            }`}
-            title="Mode Latihan: Bebas putar audio tanpa batas dan transkrip langsung bisa dibuka"
-          >
-            Latihan Santai: {practiceMode ? "ON" : "OFF"}
-          </button>
+          <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hidden sm:inline">
+            Terjawab: {Object.keys(answers).length}/{allQuestions.length}
+          </span>
 
           {!isSubmitted ? (
             <button
@@ -267,7 +314,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
           ) : (
             <button
               type="button"
-              onClick={resetExam}
+              onClick={() => handleResetExam(true)}
               className="px-4 py-2 rounded-xl bg-zinc-700 hover:bg-zinc-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -305,7 +352,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
               </div>
             </div>
             <div className="text-xs text-zinc-600 dark:text-zinc-400">
-              Transkrip percakapan kini dapat dibaca di bagian bawah.
+              Transkrip audio kini terbuka dan kata-kata penting dapat diklik untuk disimpan.
             </div>
           </div>
         </div>
@@ -316,19 +363,26 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <span className="text-[10px] font-bold tracking-widest text-purple-400 uppercase">
-              SMART GERMAN AUDIO PLAYER (WEB SPEECH API)
+              SMART GERMAN AUDIO PLAYER (BULLETPROOF DE-DE ENGINE)
             </span>
             <h3 className="text-lg font-black text-white flex items-center gap-2">
               <Volume2 className="w-5 h-5 text-purple-400" />
               {currentTeil.title}
             </h3>
             <p className="text-xs text-zinc-300">
-              Aturan Goethe: Audio Teil ini diputar <strong>{currentTeil.playLimit}x</strong>.
-              (Sudah diputar: {currentPlays} / {currentTeil.playLimit}x)
+              {examMode === "exam" ? (
+                <>
+                  Aturan Resmi: Diputar <strong>{currentTeil.playLimit}x</strong>. (Sudah diputar: {currentPlays}/{currentTeil.playLimit}x)
+                </>
+              ) : (
+                <span className="text-emerald-300 font-semibold">
+                  Study Mode: Putar audio sepuasnya tanpa batasan kuota.
+                </span>
+              )}
             </p>
           </div>
 
-          {/* Player controls */}
+          {/* Controls */}
           <div className="flex items-center gap-3">
             {/* Speed selection */}
             <div className="flex items-center gap-1 bg-white/10 p-1 rounded-xl text-xs font-bold">
@@ -347,7 +401,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
               ))}
             </div>
 
-            {/* Play/Pause Button */}
+            {/* Play/Stop Button */}
             <button
               type="button"
               disabled={!canPlay && !isPlaying}
@@ -362,7 +416,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
             >
               {isPlaying ? (
                 <>
-                  <Pause className="w-4 h-4 fill-white" />
+                  <Square className="w-4 h-4 fill-white" />
                   <span>Hentikan Audio</span>
                 </>
               ) : (
@@ -370,7 +424,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
                   <Play className="w-4 h-4 fill-white" />
                   <span>
                     {canPlay
-                      ? `Putar Audio (${currentPlays + 1}/${currentTeil.playLimit})`
+                      ? `Putar Audio (${examMode === "study" ? "Bebas" : `${currentPlays + 1}/${currentTeil.playLimit}`})`
                       : "Batas Putar Tercapai"}
                   </span>
                 </>
@@ -381,21 +435,29 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
 
         {/* Animated Speaking Wave visualizer */}
         {isPlaying && (
-          <div className="flex items-center gap-1.5 pt-2">
-            <span className="text-[11px] font-semibold text-purple-300 mr-2">
-              Audio Sedang Berbicara (de-DE):
-            </span>
-            {[40, 70, 100, 60, 90, 50, 80, 45, 95, 60, 30].map((h, i) => (
-              <div
-                key={i}
-                className="w-1 bg-purple-400 rounded-full animate-pulse"
-                style={{
-                  height: `${h * 0.25}px`,
-                  animationDelay: `${i * 120}ms`,
-                  animationDuration: "800ms",
-                }}
-              />
-            ))}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-purple-800/40">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-semibold text-purple-300 mr-2">
+                Suara Asli Jerman Aktif:
+              </span>
+              {[40, 70, 100, 60, 90, 50, 80, 45, 95, 60, 30].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-1 bg-purple-400 rounded-full animate-pulse"
+                  style={{
+                    height: `${h * 0.25}px`,
+                    animationDelay: `${i * 120}ms`,
+                    animationDuration: "800ms",
+                  }}
+                />
+              ))}
+            </div>
+
+            {currentSentenceInfo && (
+              <span className="text-[11px] font-mono text-purple-300 font-bold">
+                Membaca Kalimat {currentSentenceInfo.current} dari {currentSentenceInfo.total}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -429,17 +491,16 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {currentTeil.questions.map((q) => {
             const userAns = answers[q.id];
+            const isRevealed = isSubmitted || (examMode === "study" && !!userAns);
 
             return (
               <div
                 key={q.id}
                 className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">
-                    Aufgabe {q.questionNumber}
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                  Aufgabe {q.questionNumber}
+                </span>
 
                 <p className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-white leading-snug">
                   {q.questionText}
@@ -452,7 +513,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
                     let optStyle =
                       "border-zinc-200 dark:border-zinc-700/80 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200";
 
-                    if (isSubmitted) {
+                    if (isRevealed) {
                       if (opt === q.correctAnswer) {
                         optStyle =
                           "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 font-bold";
@@ -476,10 +537,10 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
                         className={`w-full p-2.5 rounded-xl border text-left text-xs font-medium transition-all flex items-center justify-between ${optStyle}`}
                       >
                         <span>{opt}</span>
-                        {isSelected && !isSubmitted && (
+                        {isSelected && !isRevealed && (
                           <div className="w-2 h-2 rounded-full bg-purple-500" />
                         )}
-                        {isSubmitted && opt === q.correctAnswer && (
+                        {isRevealed && opt === q.correctAnswer && (
                           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                         )}
                       </button>
@@ -488,7 +549,7 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
                 </div>
 
                 {/* Explanation */}
-                {isSubmitted && (
+                {isRevealed && (
                   <div className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs space-y-1">
                     <div className="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-white">
                       <HelpCircle className="w-3.5 h-3.5 text-purple-500" />
@@ -503,14 +564,14 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
         </div>
       </div>
 
-      {/* Transcript Reveal Box (Available after submit or in practice mode) */}
+      {/* Transcript Reveal Box (Interactive with Tooltip Dictionary) */}
       <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-sm text-zinc-900 dark:text-white">
             <FileText className="w-4 h-4 text-purple-500" />
             <span>Transkrip Audio Bahasa Jerman</span>
           </div>
-          {(isSubmitted || practiceMode) && (
+          {(isSubmitted || examMode === "study") && (
             <button
               type="button"
               onClick={() => setShowTranscript(!showTranscript)}
@@ -521,13 +582,19 @@ export const HorenView: React.FC<HorenViewProps> = ({ stats }) => {
           )}
         </div>
 
-        {!isSubmitted && !practiceMode ? (
+        {!isSubmitted && examMode === "exam" ? (
           <p className="text-xs text-zinc-600 dark:text-zinc-400 italic">
-            🔒 Sesuai aturan ujian Goethe B1, transkrip audio terkunci dan hanya dapat dibuka setelah ujian disubmit (atau saat Mode Latihan Santai diaktifkan).
+            🔒 Sesuai aturan Goethe B1, transkrip terkunci selama Real Exam dan akan terbuka setelah submit (atau ubah ke Study Mode di atas).
           </p>
         ) : showTranscript ? (
-          <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-700 font-serif text-xs text-zinc-800 dark:text-zinc-200 whitespace-pre-line leading-relaxed animate-fade-in">
-            {currentTeil.audioTranscript}
+          <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-700 animate-fade-in space-y-2">
+            <div className="text-[11px] text-amber-600 dark:text-amber-400">
+              💡 Ketuk kata bergaris bawah untuk melihat terjemahan kata atau menambahkannya ke Kamus Kosakata.
+            </div>
+            <InteractiveText
+              text={currentTeil.audioTranscript}
+              className="text-xs text-zinc-800 dark:text-zinc-200 font-serif leading-relaxed"
+            />
           </div>
         ) : null}
       </div>

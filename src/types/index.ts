@@ -139,6 +139,17 @@ export interface FehlerItem {
   mastered: boolean;
 }
 
+// VOCABULARY BOOK (Meine Vokabeln)
+export interface VocabItem {
+  id: string;
+  german: string;
+  indonesian: string;
+  article?: "der" | "die" | "das";
+  exampleSentence?: string;
+  dateAdded: string;
+  learned: boolean;
+}
+
 // USER STATS & EXAM HISTORY
 export interface ExamResultRecord {
   id: string;
@@ -160,4 +171,24 @@ export interface UserStats {
   totalGameCorrect: number;
   activePacket: PacketId;
   zenMode: boolean;
+  candidateName?: string;
+}
+
+// ACTIVE EXAM SESSIONS (Auto-save)
+export interface ActiveExamSession<T> {
+  packetId: "A" | "B" | "C";
+  mode: "exam" | "study";
+  answers: Record<string, string>;
+  flagged?: Record<string, boolean>;
+  timeLeft: number;
+  currentTeilIndex: number;
+  isSubmitted: boolean;
+  scoreResult?: {
+    score: number;
+    correctCount: number;
+    totalCount: number;
+    passed: boolean;
+  } | null;
+  extraData?: T;
+  lastUpdated: string;
 }

@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zertiva B1 Personal Studio | Goethe B1 Simulator & Game Arena",
+  title: "GoetheMeister B1 Studio | Goethe-Zertifikat B1 Exam Studio & Game Arena",
   description:
-    "Simulator Ujian Resmi Goethe-Zertifikat B1 (Lesen, Hören, Schreiben, Sprechen), Game Arena Interaktif (Easy, Medium, Hard), Spaced Repetition Fehlerbuch, dan Smart Audio Player.",
+    "GoetheMeister B1 Studio (GMB1) - Simulator Ujian Resmi Goethe-Zertifikat B1 (Lesen, Hören, Schreiben, Sprechen), Game Arena Interaktif (Easy, Medium, Hard), Bulletproof Audio de-DE, Kamus Meine Vokabeln & Sertifikat Digital.",
 };
 
 export default function RootLayout({

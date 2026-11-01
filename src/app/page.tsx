@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { UserStats, PacketId, ExamResultRecord } from "@/types";
-import { getStoredStats, saveStats, getFehlerbuch, getExamHistory } from "@/lib/storage";
+import {
+  getStoredStats,
+  saveStats,
+  getFehlerbuch,
+  getExamHistory,
+  getSavedVocab,
+} from "@/lib/storage";
 import { Navbar } from "@/components/Navbar";
 import { Sidebar, TabKey } from "@/components/Sidebar";
 import { DashboardView } from "@/components/DashboardView";
@@ -11,7 +17,9 @@ import { LesenView } from "@/components/LesenView";
 import { HorenView } from "@/components/HorenView";
 import { SchreibenView } from "@/components/SchreibenView";
 import { SprechenView } from "@/components/SprechenView";
+import { MeineVokabelnView } from "@/components/MeineVokabelnView";
 import { FehlerbuchView } from "@/components/FehlerbuchView";
+import { ReportCardView } from "@/components/ReportCardView";
 import { JsonManagerView } from "@/components/JsonManagerView";
 import { UmlautHelperBar } from "@/components/UmlautHelperBar";
 import { Keyboard } from "lucide-react";
@@ -28,8 +36,10 @@ export default function Home() {
     totalGameCorrect: 0,
     activePacket: "A",
     zenMode: false,
+    candidateName: "Goethe-Kandidat",
   });
   const [fehlerCount, setFehlerCount] = useState<number>(0);
+  const [vocabCount, setVocabCount] = useState<number>(0);
   const [examHistory, setExamHistory] = useState<ExamResultRecord[]>([]);
   const [showGlobalUmlaut, setShowGlobalUmlaut] = useState<boolean>(false);
 
@@ -38,6 +48,7 @@ export default function Home() {
     setStats(s);
     const fb = getFehlerbuch().filter((f) => !f.mastered);
     setFehlerCount(fb.length);
+    setVocabCount(getSavedVocab().length);
     setExamHistory(getExamHistory());
   };
 
@@ -57,7 +68,7 @@ export default function Home() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-            Memuat Zertiva B1 Studio...
+            Memuat GoetheMeister B1 Studio...
           </span>
         </div>
       </div>
@@ -82,6 +93,7 @@ export default function Home() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           fehlerCount={fehlerCount}
+          vocabCount={vocabCount}
         />
 
         {/* Content View Container */}
@@ -113,7 +125,17 @@ export default function Home() {
 
           {activeTab === "sprechen" && <SprechenView stats={stats} />}
 
+          {activeTab === "meine-vokabeln" && <MeineVokabelnView />}
+
           {activeTab === "fehlerbuch" && <FehlerbuchView />}
+
+          {activeTab === "report-card" && (
+            <ReportCardView
+              stats={stats}
+              history={examHistory}
+              onStatsUpdate={setStats}
+            />
+          )}
 
           {activeTab === "json-manager" && (
             <JsonManagerView stats={stats} onRefresh={refreshState} />
@@ -122,7 +144,7 @@ export default function Home() {
       </div>
 
       {/* Floating Global Umlaut Helper Button & Popover */}
-      <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2">
+      <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2 print:hidden">
         {showGlobalUmlaut && (
           <div className="animate-fade-in shadow-2xl">
             <UmlautHelperBar isFloating />
@@ -135,7 +157,7 @@ export default function Home() {
           title="Buka / Tutup Virtual Umlaut Bar"
         >
           <Keyboard className="w-4 h-4 text-amber-500" />
-          <span className="hidden sm:inline">Umlaut Helper</span>
+          <span className="hidden sm:inline">Umlaut Bar</span>
         </button>
       </div>
     </div>
