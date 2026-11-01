@@ -1,0 +1,131 @@
+{
+  "paket": "D",
+  "name": "Paket Cadangan Ekstra (Bonus Pack 1)",
+  "description": "Bank Soal Tambahan B1 untuk Game Arena: Wortschatz, Konnektoren, Satzbau & Redemittel",
+  "version": "1.0",
+  "questions": [
+    {
+      "id": "bonus-easy-1",
+      "packet": "C",
+      "difficulty": "easy",
+      "category": "artikel",
+      "question": "Welcher Artikel passt? '___ Umweltschutz ist eine globale Herausforderung.'",
+      "promptIndo": "Tentukan artikel untuk kata benda majemuk 'Umweltschutz' (kata dasar: der Schutz).",
+      "options": ["Der", "Die", "Das", "Den"],
+      "correctAnswer": "Der",
+      "explanation": "Pada kata benda majemuk (Komposita), gender ditentukan oleh kata terakhir. 'Der Schutz' bergender maskulin, sehingga 'der Umweltschutz'.",
+      "ruleTip": "Komposita: Das letzte Nomen bestimmt das Geschlecht."
+    },
+    {
+      "id": "bonus-easy-2",
+      "packet": "C",
+      "difficulty": "easy",
+      "category": "wortschatz",
+      "question": "Was ist das Gegenteil von 'preiswert' (murah/terjangkau)?",
+      "promptIndo": "Pilih lawan kata dari 'preiswert' / 'günstig'.",
+      "options": ["kostspielig / teuer", "bequem", "zuverlässig", "kostenlos"],
+      "correctAnswer": "kostspielig / teuer",
+      "explanation": "'Preiswert' berarti sepadan dengan harganya (terjangkau). Lawan katanya adalah 'teuer' atau 'kostspielig' (mahal).",
+      "ruleTip": "preiswert = günstig; Gegenteil: teuer / kostspielig."
+    },
+    {
+      "id": "bonus-easy-3",
+      "packet": "C",
+      "difficulty": "easy",
+      "category": "wortschatz",
+      "question": "Welches Verb gehört zur Nomen-Verb-Verbindung: 'einen Vorschlag ___' (mengajukan usulan)?",
+      "promptIndo": "Pasangan kata kerja standar B1 untuk 'einen Vorschlag' adalah...",
+      "options": ["machen", "nehmen", "treffen", "schreiben"],
+      "correctAnswer": "machen",
+      "explanation": "'Einen Vorschlag machen' berarti mengusulkan sesuatu (vorschlagen).",
+      "ruleTip": "einen Vorschlag machen = vorschlagen."
+    },
+    {
+      "id": "bonus-med-1",
+      "packet": "C",
+      "difficulty": "medium",
+      "category": "konnektoren",
+      "question": "Ergänzen Sie: '___ er fleißig gelernt hatte, bestand er die Prüfung mit Bestnote.'",
+      "promptIndo": "Konnektor temporal lampau (karena sudah/setelah - Vorzeitigkeit):",
+      "options": ["Nachdem", "Während", "Seitdem", "Bis"],
+      "correctAnswer": "Nachdem",
+      "explanation": "'Nachdem' digunakan untuk menyatakan urutan peristiwa masa lalu di mana anak kalimat terjadi lebih dulu (Plusquamperfekt: gelernt hatte, Präteritum: bestand).",
+      "ruleTip": "Nachdem + Plusquamperfekt, Hauptsatz im Präteritum."
+    },
+    {
+      "id": "bonus-med-2",
+      "packet": "C",
+      "difficulty": "medium",
+      "category": "praepositionen",
+      "question": "Ergänzen Sie: 'Ich bewerbe mich bei der Firma ___ die offene Stelle als Webdesigner.'",
+      "promptIndo": "Kata kerja 'sich bewerben' berpasangan dengan: bei + Dat (perusahaan) dan ___ + Akk (posisi/pekerjaan).",
+      "options": ["um", "für", "an", "nach"],
+      "correctAnswer": "um",
+      "explanation": "Rumus: 'sich bewerben um eine Stelle / einen Arbeitsplatz (+ Akkusativ)'.",
+      "ruleTip": "sich bewerben um + Akk (melamar posisi kerja)."
+    },
+    {
+      "id": "bonus-med-3",
+      "packet": "C",
+      "difficulty": "medium",
+      "category": "konnektoren",
+      "question": "Ergänzen Sie: 'Wir müssen uns beeilen, ___ wir den letzten Bus noch erreichen.'",
+      "promptIndo": "Klausa tujuan (damit) ketika ingin menyatakan agar/supaya:",
+      "options": ["damit", "obwohl", "indem", "nachdem"],
+      "correctAnswer": "damit",
+      "explanation": "'Damit' adalah konjungsi tujuan (Finalsatz) yang menempatkan kata kerja di akhir klausa ('erreichen').",
+      "ruleTip": "damit + Nebensatz = supaya / agar."
+    },
+    {
+      "id": "bonus-hard-1",
+      "packet": "C",
+      "difficulty": "hard",
+      "category": "passiv_konjunktiv",
+      "question": "Passiv mit Modalverb im Präteritum: 'Die Verträge ___ gestern vor 17 Uhr ___.'",
+      "promptIndo": "Ubah ke Pasif lampau dengan Modalverb: müssen (mussten) + Partizip II + werden.",
+      "options": [
+        "mussten ... unterschrieben werden",
+        "wurden ... unterschreiben müssen",
+        "sind ... unterschrieben gemusst",
+        "hätten ... unterschrieben werden"
+      ],
+      "correctAnswer": "mussten ... unterschrieben werden",
+      "explanation": "Rumus Passiv Präteritum mit Modalverb: Modalverb im Präteritum (mussten) + Partizip II (unterschrieben) + werden.",
+      "ruleTip": "Präteritum Passiv + Modalverb: mussten + Partizip II + werden."
+    },
+    {
+      "id": "bonus-hard-2",
+      "packet": "C",
+      "difficulty": "hard",
+      "category": "passiv_konjunktiv",
+      "question": "Konjunktiv II der Gegenwart: 'Wenn ich Bundeskanzler ___, ___ ich den öffentlichen Nahverkehr kostenlos machen.'",
+      "promptIndo": "Bentuk pengandaian Konjunktiv II untuk sein (ich) dan machen (ich):",
+      "options": [
+        "wäre ... würde",
+        "bin ... werde",
+        "hätte ... würde",
+        "wäre ... mache"
+      ],
+      "correctAnswer": "wäre ... würde",
+      "explanation": "Konjunktiv II dari 'sein' adalah 'wäre', dan untuk kata kerja biasa 'machen' digunakan bentuk 'würde + Infinitiv'.",
+      "ruleTip": "Irrealer Wunschsatz: Wenn ich ... wäre, würde ich ..."
+    },
+    {
+      "id": "bonus-hard-3",
+      "packet": "C",
+      "difficulty": "hard",
+      "category": "satzbau",
+      "question": "Zweiteilige Konnektoren: 'Das neue Smartphone ist ___ sehr elegant, ___ es hat eine extrem kurze Akkulaufzeit.'",
+      "promptIndo": "Pasangan konnektor berlawanan (memang... tetapi...):",
+      "options": [
+        "zwar ... aber",
+        "sowohl ... als auch",
+        "weder ... noch",
+        "entweder ... oder"
+      ],
+      "correctAnswer": "zwar ... aber",
+      "explanation": "'Zwar ... aber' digunakan untuk mengakui satu kelebihan/fakta tetapi mengemukakan pertentangan/kelemahan.",
+      "ruleTip": "zwar ..., aber = memang ..., namun ..."
+    }
+  ]
+}
